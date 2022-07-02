@@ -1,4 +1,5 @@
 """Constants for the Purple Air integration."""
+from homeassistant.const import TEMP_FAHRENHEIT, SIGNAL_STRENGTH_DECIBELS_MILLIWATT, PRESSURE_HPA,PERCENTAGE, DEVICE_CLASS_AQI
 
 AQI_BREAKPOINTS = {
     'pm2_5': [
@@ -12,15 +13,32 @@ AQI_BREAKPOINTS = {
         { 'pm_low':     0, 'pm_high':  12.0, 'aqi_low':   0, 'aqi_high':  50 },
     ],
 }
+PARTICLE_PROPS = ['pm1_0_atm', 'pm2_5_atm', 'pm10_0_atm']
 
+# Map of sensors to create entities for
+SENSORS_MAP = {
+    'particulate_matter_0_1':  {'key': 'pm1_0_atm',        'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur'},
+    'particulate_matter_2_5':  {'key': 'pm2_5_atm',        'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur'},
+    'particulate_matter_10':   {'key': 'pm10_0_atm',       'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur'},
+    'air_quality_index_epa':   {'key': 'aqi_epa',          'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:weather-hazy'},
+    'air_quality_index_lrapa': {'key': 'aqi_lrapa',        'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:weather-hazy'},
+    'humidity':                {'key': 'current_humidity', 'uom': PERCENTAGE,       'icon': 'mdi:water-percent'},
+    'temperature':             {'key': 'current_temp',     'uom': TEMP_FAHRENHEIT,  'icon': 'mdi:thermometer'},
+    'dewpoint':                {'key': 'current_dewpoint', 'uom': TEMP_FAHRENHEIT,  'icon': 'mdi:water-outline'},
+    'pressure':                {'key': 'pressure',         'uom': PRESSURE_HPA,     'icon': 'mdi:gauge'},
+    'rssi':                    {'key': 'rssi',             'uom': SIGNAL_STRENGTH_DECIBELS_MILLIWATT, 'icon': 'mdi:wifi'}
+}
+
+MANUFACTURER = 'Purple Air'
 DISPATCHER_PURPLE_AIR = 'dispatcher_purple_air'
-
 DOMAIN = "purpleair"
 
-JSON_PROPERTIES = ['pm1_0_atm', 'pm2_5_atm', 'pm10_0_atm']
+LOCAL_SCAN_INTERVAL = 60
+LOCAL_URL_FORMAT = "http://{0}/json?live=false"
 
-SCAN_INTERVAL = 300
-
-PUBLIC_URL = "https://www.purpleair.com/json?show={nodes}"
-
-PRIVATE_URL = "https://www.purpleair.com/json?show={nodes}&key={key}"
+# Models
+PMS_SENSOR = 'PMS'
+BME_SENSOR = 'BME'
+MODEL_PA_1 = 'PA-I'
+MODEL_PA_2 = 'PA-II'
+MODEL_PA_FLEX = 'PA-II-FLEX'

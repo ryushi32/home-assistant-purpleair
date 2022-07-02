@@ -5,7 +5,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval, async_track_point_in_utc_time
 from homeassistant.util import dt
 
-from .const import AQI_BREAKPOINTS, DISPATCHER_PURPLE_AIR, JSON_PROPERTIES, SCAN_INTERVAL, PUBLIC_URL, PRIVATE_URL
+from .const import AQI_BREAKPOINTS, DISPATCHER_PURPLE_AIR, PARTICLE_PROPS, LOCAL_SCAN_INTERVAL, LOCAL_URL_FORMAT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -15,8 +15,7 @@ def calc_aqi(value, index):
         _LOGGER.debug('calc_aqi requested for unknown type: %s', index)
         return None
 
-    bp = next((bp for bp in AQI_BREAKPOINTS[index] if value >= bp['pm_low'] and value <=
-              bp['pm_high']), None)
+    bp = next((bp for bp in AQI_BREAKPOINTS[index] if bp['pm_low'] <= value <= bp['pm_high']), None)
     if not bp:
         _LOGGER.debug('value %s did not fall in valid range for type %s', value, index)
         return None
@@ -27,36 +26,61 @@ def calc_aqi(value, index):
     return round((aqi_range/pm_range) * c + bp['aqi_low'])
 
 
+# LRAPA conversion using the same formula as used by PurpleAir's map as of 2020-09-06
+def lrapa(value):
+    return max(0, 0.5 * value - 0.66)
+
+
+def process_readings(json_result, is_dual = False):
+    readings = {'pm2_5_aqi_original': json_result['pm2.5_aqi']}
+    if is_dual:
+        readings['pm2_5_aqi_b_original'] = json_result['pm2.5_aqi_b']
+
+    for prop in PARTICLE_PROPS:
+        if prop not in json_result:
+            readings[prop] = None
+            continue
+
+        a = float(json_result[prop])
+        prop_b = prop + '_b'  # Property name for sensor B
+        if is_dual and prop_b in json_result:
+            b = float(json_result[prop_b])
+        else:
+            b = a
+        readings[prop] = round((a + b) / 2, 1)
+        readings[f'{prop}_confidence'] = 'Good' if abs(a - b) < 45 else 'Questionable'
+
+    readings['aqi_epa'] = calc_aqi(readings['pm2_5_atm'], 'pm2_5')
+    readings['aqi_lrapa'] = calc_aqi(lrapa(readings['pm2_5_atm']), 'pm2_5')
+    return readings
+
+
 class PurpleAirApi:
     def __init__(self, hass, session):
         self._hass = hass
         self._session = session
         self._nodes = {}
         self._data = {}
-        self._scan_interval = timedelta(seconds=SCAN_INTERVAL)
+        self._scan_interval = timedelta(seconds=LOCAL_SCAN_INTERVAL)
         self._shutdown_interval = None
 
-    def is_node_registered(self, node_id):
-        return node_id in self._data
+    def is_node_registered(self, pa_sensor_id):
+        return pa_sensor_id in self._data
 
-    def get_property(self, node_id, prop):
-        if node_id not in self._data:
+    def get_reading(self, pa_sensor_id, prop):
+        if pa_sensor_id not in self._data:
             return None
 
-        node = self._data[node_id]
-        return node[prop]
+        node = self._data[pa_sensor_id]
+        return node[prop] if prop in node else None
 
-    def get_reading(self, node_id, prop):
-        readings = self.get_property(node_id, 'readings')
-        return readings[prop] if prop in readings else None
-
-    def register_node(self, node_id, hidden, key):
-        if node_id in self._nodes:
-            _LOGGER.debug('detected duplicate registration: %s', node_id)
+    def register_node(self, pa_sensor_id, ip_address):
+        if pa_sensor_id in self._nodes:
+            _LOGGER.debug('detected duplicate registration: %s', pa_sensor_id)
             return
 
-        self._nodes[node_id] = { 'hidden': hidden, 'key': key }
-        _LOGGER.debug('registered new node: %s', node_id)
+        self._nodes[pa_sensor_id] = { 'ip_address': ip_address }
+        _LOGGER.debug('registered new node: %s', pa_sensor_id)
 
         if not self._shutdown_interval:
             _LOGGER.debug('starting background poll: %s', self._scan_interval)
@@ -72,13 +96,13 @@ class PurpleAirApi:
                 dt.utcnow() + timedelta(seconds=5)
             )
 
-    def unregister_node(self, node_id):
-        if node_id not in self._nodes:
-            _LOGGER.debug('detected non-existent unregistration: %s', node_id)
+    def unregister_node(self, pa_sensor_id):
+        if pa_sensor_id not in self._nodes:
+            _LOGGER.debug('detected non-existent unregistration: %s', pa_sensor_id)
             return
 
-        del self._nodes[node_id]
-        _LOGGER.debug('unregistered node: %s', node_id)
+        del self._nodes[pa_sensor_id]
+        _LOGGER.debug('unregistered node: %s', pa_sensor_id)
 
         if not self._nodes and self._shutdown_interval:
             _LOGGER.debug('no more nodes, shutting down interval')
@@ -86,37 +110,12 @@ class PurpleAirApi:
             self._shutdown_interval = None
 
 
-    async def _fetch_data(self, public_nodes, private_nodes):
-        urls = []
-
-        if private_nodes:
-            by_keys = {}
-            for node in private_nodes:
-                data = self._nodes[node]
-                key = data['key'] if 'key' in data else None
-
-                if key:
-                    if key not in by_keys:
-                        by_keys[key] = []
-
-                    by_keys[key].append(node)
-
-            used_public = False
-            for key, private_nodes_for_key in by_keys.items():
-                nodes = private_nodes_for_key
-                if not used_public:
-                    nodes += public_nodes
-                    used_public = True
-
-                urls.append(PRIVATE_URL.format(nodes='|'.join(nodes), key=key))
-
-        elif public_nodes:
-            urls.append(PUBLIC_URL.format(nodes='|'.join(public_nodes)))
-
-        else:
+    async def _fetch_data(self, local_node_ips):
+        if not local_node_ips:
             _LOGGER.debug('no nodes provided')
             return []
 
+        urls =  map(LOCAL_URL_FORMAT.format, local_node_ips)
         _LOGGER.debug('fetch url list: %s', urls)
 
         results = []
@@ -128,69 +127,31 @@ class PurpleAirApi:
                     _LOGGER.warning('bad API response for %s: %s', url, response.status)
 
                 json = await response.json()
-                results += json['results']
+                results.append(json)
 
         return results
 
-
     async def _update(self, now=None):
-        public_nodes = [node_id for node_id in self._nodes if not self._nodes[node_id]['hidden']]
-        private_nodes = [node_id for node_id in self._nodes if self._nodes[node_id]['hidden']]
+        local_node_ips = [n['ip_address'] for n in self._nodes.values()]
+        _LOGGER.debug('nodes: %s', local_node_ips)
 
-        _LOGGER.debug('public nodes: %s, private nodes: %s', public_nodes, private_nodes)
-
-        results = await self._fetch_data(public_nodes, private_nodes)
+        results = await self._fetch_data(local_node_ips)
 
         nodes = {}
         for result in results:
-            node_id = str(result['ID'] if 'ParentID' not in result else result['ParentID'])
-            if 'ParentID' not in result:
-                nodes[node_id] = {
-                    'last_seen': result['LastSeen'],
-                    'last_update': result['LastUpdateCheck'],
-                    'device_location': result['DEVICE_LOCATIONTYPE'] if 'DEVICE_LOCATIONTYPE'
-                        in result else 'unknown',
-                    'readings': {},
-                }
-
-            sensor = 'A' if 'ParentID' not in result else 'B'
-            readings = nodes[node_id]['readings']
-
-            sensor_data = readings[sensor] if sensor in readings else {}
-            for prop in JSON_PROPERTIES:
-                sensor_data[prop] = result[prop] if prop in result else None
-
-            if not all(value is None for value in sensor_data.values()):
-                readings[sensor] = sensor_data
-            else:
-                _LOGGER.debug('node %s did not contain any data', node_id)
-
-        for node in nodes:
-            readings = nodes[node]['readings']
-            _LOGGER.debug('processing node %s, readings: %s', node, readings)
-
-            if 'A' in readings and 'B' in readings:
-                for prop in JSON_PROPERTIES:
-                    if prop in readings['A'] and prop in readings['B']:
-                        a = float(readings['A'][prop])
-                        b = float(readings['B'][prop])
-                        readings[prop] = round((a + b) / 2, 1)
-                        readings[f'{prop}_confidence'] = 'Good' if abs(a - b) < 45 else 'Questionable'
-                    else:
-                        readings[prop] = None
-            else:
-                for prop in JSON_PROPERTIES:
-                    if prop in readings['A']:
-                        a = float(readings['A'][prop])
-                        readings[prop] = round(a, 1)
-                        readings[f'{prop}_confidence'] = 'Good'
-                    else:
-                        readings[prop] = None
-
-            _LOGGER.debug('node results %s, readings: %s', node, readings)
-
-            if 'pm2_5_atm' in readings and readings['pm2_5_atm']:
-                readings['pm2_5_atm_aqi'] = calc_aqi(readings['pm2_5_atm'], 'pm2_5')
+            pa_sensor_id = result['SensorId']
+            is_dual = 'pm2.5_aqi_b' in result
+            nodes[pa_sensor_id] = {
+                'device_location': result['place'],
+                'rssi': result['rssi'],
+                'current_temp': result['current_temp_f'],
+                'current_humidity': result['current_humidity'],
+                'current_dewpoint': result['current_dewpoint_f'],
+                'pressure': result['pressure'],
+                'is_dual': is_dual
+            }
+            nodes[pa_sensor_id].update(process_readings(result, is_dual))
+            _LOGGER.debug('json results %s <===> readings: %s', result, nodes[pa_sensor_id])
 
         self._data = nodes
         async_dispatcher_send(self._hass, DISPATCHER_PURPLE_AIR)
