@@ -115,7 +115,7 @@ class PurpleAirApi:
             _LOGGER.debug('no nodes provided')
             return []
 
-        urls =  map(LOCAL_URL_FORMAT.format, local_node_ips)
+        urls = list(map(LOCAL_URL_FORMAT.format, local_node_ips))
         _LOGGER.debug('fetch url list: %s', urls)
 
         results = []
@@ -133,7 +133,7 @@ class PurpleAirApi:
 
     async def _update(self, now=None):
         local_node_ips = [n['ip_address'] for n in self._nodes.values()]
-        _LOGGER.debug('nodes: %s', local_node_ips)
+        _LOGGER.debug('Purple Air nodes: %s', local_node_ips)
 
         results = await self._fetch_data(local_node_ips)
 
@@ -151,7 +151,8 @@ class PurpleAirApi:
                 'is_dual': is_dual
             }
             nodes[pa_sensor_id].update(process_readings(result, is_dual))
-            _LOGGER.debug('json results %s <===> readings: %s', result, nodes[pa_sensor_id])
+            _LOGGER.debug('Json results for %s: %s', pa_sensor_id, result)
+            _LOGGER.debug('Readings for %s: %s', pa_sensor_id, nodes[pa_sensor_id])
 
         self._data = nodes
         async_dispatcher_send(self._hass, DISPATCHER_PURPLE_AIR)

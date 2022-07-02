@@ -33,7 +33,7 @@ MANUFACTURER = 'Purple Air'
 DISPATCHER_PURPLE_AIR = 'dispatcher_purple_air'
 DOMAIN = "purpleair"
 
-LOCAL_SCAN_INTERVAL = 60
+LOCAL_SCAN_INTERVAL = 30
 LOCAL_URL_FORMAT = "http://{0}/json?live=false"
 
 # Models
