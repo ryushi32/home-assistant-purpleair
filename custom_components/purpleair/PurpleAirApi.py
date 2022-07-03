@@ -1,11 +1,14 @@
 from datetime import timedelta
 import logging
 
+import math
+
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval, async_track_point_in_utc_time
 from homeassistant.util import dt
 
-from .const import AQI_BREAKPOINTS, DISPATCHER_PURPLE_AIR, PARTICLE_PROPS, LOCAL_SCAN_INTERVAL, LOCAL_URL_FORMAT
+from .const import AQI_BREAKPOINTS, DISPATCHER_PURPLE_AIR, PARTICLE_PROPS, LOCAL_SCAN_INTERVAL, LOCAL_URL_FORMAT, \
+    TEMP_ADJUSTMENT, HUMIDITY_ADJUSTMENT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,7 +34,36 @@ def lrapa(value):
     return max(0, 0.5 * value - 0.66)
 
 
-def process_readings(json_result, is_dual = False):
+def calc_dewpoint(temp_f, humidity):
+    """
+    Calculate dewpoint using August-Roche-Magnus approximation.
+    Note: Rounding twice for both F>C and C>F conversions simply because the purpleair website does this (so I
+    do this too, to match the purpleair website).
+    """
+    temp_c = round((temp_f - 32) * 5.0/9.0)
+
+    numerator = 243.04 * (math.log(humidity / 100) + ((17.625 * temp_c) / (243.04 + temp_c)))
+    denominator = 17.625 - math.log(humidity / 100) - ((17.625 * temp_c) / (243.04 + temp_c))
+    dew_point_c = numerator / denominator
+
+    dew_point_f = round((dew_point_c * 9/5) + 32)
+    return dew_point_f
+
+
+def process_heat_adjustments(json_result):
+    """Since the purple air devices are affected by heat from itself, modify readings to account for difference"""
+    new_temp = json_result['current_temp_f'] + TEMP_ADJUSTMENT
+    new_humid = min(100, json_result['current_humidity'] + HUMIDITY_ADJUSTMENT)
+
+    return {
+        'current_temp': new_temp,
+        'current_humidity': new_humid,
+        'current_dewpoint': calc_dewpoint(new_temp, new_humid)
+    }
+
+
+def process_pm_readings(json_result, is_dual = False):
+    """Processes Particle mass readings and confidence of said readings"""
     readings = {'pm2_5_aqi_original': json_result['pm2.5_aqi']}
     if is_dual:
         readings['pm2_5_aqi_b_original'] = json_result['pm2.5_aqi_b']
@@ -144,13 +176,14 @@ class PurpleAirApi:
             nodes[pa_sensor_id] = {
                 'device_location': result['place'],
                 'rssi': result['rssi'],
-                'current_temp': result['current_temp_f'],
-                'current_humidity': result['current_humidity'],
-                'current_dewpoint': result['current_dewpoint_f'],
+                'current_temp_raw': result['current_temp_f'],
+                'current_humidity_raw': result['current_humidity'],
+                'current_dewpoint_raw': result['current_dewpoint_f'],
                 'pressure': result['pressure'],
                 'is_dual': is_dual
             }
-            nodes[pa_sensor_id].update(process_readings(result, is_dual))
+            nodes[pa_sensor_id].update(process_pm_readings(result, is_dual))
+            nodes[pa_sensor_id].update(process_heat_adjustments(result))
             _LOGGER.debug('Json results for %s: %s', pa_sensor_id, result)
             _LOGGER.debug('Readings for %s: %s', pa_sensor_id, nodes[pa_sensor_id])
 
