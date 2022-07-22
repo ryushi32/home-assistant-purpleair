@@ -27,13 +27,18 @@ This will create 10 entities per device:
 * Particulate Matter 10
 * Air Quality Index (EPA)
 * Air Quality Index (LRAPA)
-* Humidity
-* Temperature
-* Dewpoint
+* Humidity (Adjusted sensor: +4%)
+* Temperature (Adjusted sensor: -8F)
+* Dewpoint (Adjusted sensor: re-calculated to take temp & humidity adjustments)
 * Pressure
 * RSSI
 
 Sensor data on PurpleAir is updated every 60 seconds.
+
+##### Adjusted Sensors
+In a similar manner to the actual purple air website, some sensors are adjusted manually to take into
+account the fact that the housing itself increases the temperature and has reduced humidity. Calculated
+sensors are marked above.
 
 This component is licensed under the MIT license, so feel free to copy,
 enhance, and redistribute as you see fit.
