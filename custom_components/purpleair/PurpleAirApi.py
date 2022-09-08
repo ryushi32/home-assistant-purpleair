@@ -154,12 +154,15 @@ class PurpleAirApi:
         for url in urls:
             _LOGGER.debug('fetching url: %s', url)
 
-            async with self._session.get(url) as response:
-                if response.status != 200:
-                    _LOGGER.warning('bad API response for %s: %s', url, response.status)
+            try:
+                async with self._session.get(url) as response:
+                    if response.status != 200:
+                        _LOGGER.error('bad API response for %s: %s', url, response.status)
 
-                json = await response.json()
-                results.append(json)
+                    json = await response.json()
+                    results.append(json)
+            except Exception:
+                _LOGGER.error('Unable to connect to purple air device: ' + url)
 
         return results
 
