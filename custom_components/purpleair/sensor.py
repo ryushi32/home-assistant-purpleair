@@ -4,7 +4,7 @@ import logging
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.components.sensor import SensorEntity
 
-from .const import DISPATCHER_PURPLE_AIR, DOMAIN, MANUFACTURER, SENSORS_MAP, SENSORS_DUAL_ONLY
+from .const import DISPATCHER_PURPLE_AIR, DOMAIN, MANUFACTURER, SENSORS_MAP, SENSORS_DUAL_ONLY, MODEL_PA_FLEX, MODEL_PA_2
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ async def async_setup_entry(hass, config_entry, async_schedule_add_entities):
     if 'is_dual' in config_entry.data:
         is_dual = config_entry.data['is_dual']
     else:
-        is_dual = 'PMSX003-B' in config_entry.data['model']  # Reasonable backup to test for dual sensors
+        is_dual = config_entry.data['model'] in [MODEL_PA_FLEX, MODEL_PA_2]  # Backup to test for dual sensors
 
     entities = []
     for index, entity_desc in SENSORS_MAP.items():
