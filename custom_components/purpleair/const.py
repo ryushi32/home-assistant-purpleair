@@ -17,8 +17,8 @@ PARTICLE_PROPS = ['pm1_0_atm', 'pm2_5_atm', 'pm10_0_atm']
 
 # Map of sensors to create entities for
 SENSORS_MAP = {
-    'pm2_5_aqi_a_raw':         {'key': 'pm2_5_aqi_orig',   'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur-linear'},
-    'pm2_5_aqi_b_raw':         {'key': 'pm2_5_aqi_b_orig', 'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur-linear'},
+    'pm2_5_aqi_a_raw':         {'key': 'pm2_5_aqi_raw',    'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur-linear'},
+    'pm2_5_aqi_b_raw':         {'key': 'pm2_5_aqi_b_raw',  'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur-linear'},
     'pm2_5_atm_confidence':    {'key': 'pm2_5_atm_conf',   'uom': None,             'icon': 'mdi:seal'},
     'particulate_matter_0_1':  {'key': 'pm1_0_atm',        'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur'},
     'particulate_matter_2_5':  {'key': 'pm2_5_atm',        'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur'},
@@ -31,6 +31,7 @@ SENSORS_MAP = {
     'pressure':                {'key': 'pressure',         'uom': PRESSURE_HPA,     'icon': 'mdi:gauge'},
     'rssi':                    {'key': 'rssi',             'uom': SIGNAL_STRENGTH_DECIBELS_MILLIWATT, 'icon': 'mdi:wifi'}
 }
+SENSORS_DUAL_ONLY = ['pm2_5_aqi_b_raw']
 
 MANUFACTURER = 'Purple Air'
 DISPATCHER_PURPLE_AIR = 'dispatcher_purple_air'

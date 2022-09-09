@@ -64,9 +64,9 @@ def process_heat_adjustments(json_result):
 
 def process_pm_readings(json_result, is_dual = False):
     """Processes Particle mass readings and confidence of said readings"""
-    readings = {'pm2_5_aqi_orig': json_result['pm2.5_aqi']}
+    readings = {'pm2_5_aqi_raw': json_result['pm2.5_aqi']}
     if is_dual:
-        readings['pm2_5_aqi_b_orig'] = json_result['pm2.5_aqi_b']
+        readings['pm2_5_aqi_b_raw'] = json_result['pm2.5_aqi_b']
 
     for prop in PARTICLE_PROPS:
         if prop not in json_result:

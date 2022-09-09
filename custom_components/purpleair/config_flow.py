@@ -44,6 +44,7 @@ async def validate_input(hass: core.HomeAssistant, data):
         'sw_version': json['version'],
         'hw_version': json['hardwareversion'],
         'model': get_model_name(json['hardwarediscovered']),
+        'is_dual': ('pm2.5_aqi_b' in json)
     }
 
     _LOGGER.debug('generated config data: %s', config)

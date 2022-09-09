@@ -4,7 +4,7 @@ import logging
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.components.sensor import SensorEntity
 
-from .const import DISPATCHER_PURPLE_AIR, DOMAIN, MANUFACTURER, SENSORS_MAP
+from .const import DISPATCHER_PURPLE_AIR, DOMAIN, MANUFACTURER, SENSORS_MAP, SENSORS_DUAL_ONLY
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -12,9 +12,16 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_schedule_add_entities):
     _LOGGER.debug('Registering aqi sensor with data: %s', config_entry.data)
 
+    # Backwards compat for sensors added before 'is_dual' key created in config_flow
+    if 'is_dual' in config_entry.data:
+        is_dual = config_entry.data['is_dual']
+    else:
+        is_dual = 'PMSX003-B' in config_entry.data['model']  # Reasonable backup to test for dual sensors
+
     entities = []
     for index, entity_desc in SENSORS_MAP.items():
-        entities.append(PurpleAirQualitySensor(hass, index, config_entry, entity_desc))
+        if is_dual or entity_desc['key'] not in SENSORS_DUAL_ONLY:
+            entities.append(PurpleAirQualitySensor(hass, index, config_entry, entity_desc))
 
     async_schedule_add_entities(entities)
 
