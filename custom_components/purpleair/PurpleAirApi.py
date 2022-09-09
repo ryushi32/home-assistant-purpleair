@@ -64,9 +64,9 @@ def process_heat_adjustments(json_result):
 
 def process_pm_readings(json_result, is_dual = False):
     """Processes Particle mass readings and confidence of said readings"""
-    readings = {'pm2_5_aqi_original': json_result['pm2.5_aqi']}
+    readings = {'pm2_5_aqi_orig': json_result['pm2.5_aqi']}
     if is_dual:
-        readings['pm2_5_aqi_b_original'] = json_result['pm2.5_aqi_b']
+        readings['pm2_5_aqi_b_orig'] = json_result['pm2.5_aqi_b']
 
     for prop in PARTICLE_PROPS:
         if prop not in json_result:
@@ -76,15 +76,32 @@ def process_pm_readings(json_result, is_dual = False):
         a = float(json_result[prop])
         prop_b = prop + '_b'  # Property name for sensor B
         if is_dual and prop_b in json_result:
-            b = float(json_result[prop_b])
+            (value, confidence) = process_dual_sensor_readings(a, float(json_result[prop_b]))
         else:
-            b = a
-        readings[prop] = round((a + b) / 2, 1)
-        readings[f'{prop}_confidence'] = 'Good' if abs(a - b) < 45 else 'Questionable'
+            value = a
+            confidence = 'Good'
+
+        readings[prop] = value
+        readings[f'{prop}_conf'] = confidence
 
     readings['aqi_epa'] = calc_aqi(readings['pm2_5_atm'], 'pm2_5')
     readings['aqi_lrapa'] = calc_aqi(lrapa(readings['pm2_5_atm']), 'pm2_5')
     return readings
+
+def process_dual_sensor_readings(a, b):
+    value = round((a + b) / 2, 1)
+
+    if abs(a - b) < 45:
+        confidence = 'Good'
+    elif abs(a - b) > 300:
+        # If the readings are so severly different, one is probably affected by a
+        # physical obstuction (spider?), so just throw it away and use the smaller value.
+        confidence = 'Severe'
+        value = min(a, b)
+    else:
+        confidence = 'Questionable'
+
+    return (value, confidence)
 
 
 class PurpleAirApi:
