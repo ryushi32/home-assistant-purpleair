@@ -19,7 +19,7 @@ To register a new purple air device:
 3. Give it a name.
 
 #### Current Sensors
-This will create 10 entities per device:
+This will create 12 or 13 entities per device:
 * Particulate Matter 0.1
 * Particulate Matter 2.5
 * Particulate Matter 10
@@ -30,6 +30,9 @@ This will create 10 entities per device:
 * Dewpoint (Adjusted sensor: re-calculated to take temp & humidity adjustments)
 * Pressure
 * RSSI
+* Particulate Matter 2.5 Aqi Raw value (sensor A)
+* Particulate Matter 2.5 Aqi Raw value (sensor B -- only for devices that have two)
+* PM 2.5 Confidence Level (Good, Questionable or Severe).
 
 Sensor data on PurpleAir is updated every 60 seconds.
 
@@ -42,6 +45,9 @@ This component is licensed under the MIT license, so feel free to copy,
 enhance, and redistribute as you see fit.
 
 ## Releases
+
+### 2.0.3
+Added support for dual sensor devices that have a physical issue with one sensor. If a device has dual sensors and one of them is > 300 difference, it will set the confidence to "Severe" and instead of averaging the values, will use the lower value exclusively.
 
 ### 2.0.1
 Replace public purple air device support (via purpleair.com) and replace
