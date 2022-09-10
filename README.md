@@ -7,8 +7,6 @@ _Code adapted from https://github.com/johnboiles/home-assistant-purpleair_
 It creates one device per Purple Air device registered and several sensors
 for each several readings.
 
-***Still very much a work in progress***
-
 ### Installation
 
 Simply copy the `/purpleair` directory in to your config's
