@@ -2,7 +2,7 @@
 This is an integration for home assistant that works integrates with local
 polling on your PurpleAir devices on your local network.
 
-_Code adapted from https://github.com/johnboiles/home-assistant-purpleair_
+_Code adapted from https://github.com/catchdave/home-assistant-purpleair_
 
 It creates one device per Purple Air device registered and several sensors
 for each several readings.
