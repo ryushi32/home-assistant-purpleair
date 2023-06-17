@@ -1,5 +1,5 @@
 """Constants for the Purple Air integration."""
-from homeassistant.const import TEMP_FAHRENHEIT, SIGNAL_STRENGTH_DECIBELS_MILLIWATT, PRESSURE_HPA,PERCENTAGE, DEVICE_CLASS_AQI
+from homeassistant.const import TEMP_FAHRENHEIT, SIGNAL_STRENGTH_DECIBELS_MILLIWATT, PRESSURE_HPA,PERCENTAGE, DEVICE_CLASS_AQI, AIR_QUALITY
 
 AQI_BREAKPOINTS = {
     'pm2_5': [
@@ -19,7 +19,7 @@ PARTICLE_PROPS = ['pm1_0_atm', 'pm2_5_atm', 'pm10_0_atm']
 SENSORS_MAP = {
     'pm2_5_aqi_a_raw':         {'key': 'pm2_5_aqi_raw',    'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur-linear'},
     'pm2_5_aqi_b_raw':         {'key': 'pm2_5_aqi_b_raw',  'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur-linear'},
-    'pm2_5_atm_confidence':    {'key': 'pm2_5_atm_conf',   'uom': None,             'icon': 'mdi:seal'},
+    'pm2_5_atm_confidence':    {'key': 'pm2_5_atm_conf',   'uom': AIR_QUALITY,             'icon': 'mdi:seal'},
     'particulate_matter_0_1':  {'key': 'pm1_0_atm',        'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur'},
     'particulate_matter_2_5':  {'key': 'pm2_5_atm',        'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur'},
     'particulate_matter_10':   {'key': 'pm10_0_atm',       'uom': DEVICE_CLASS_AQI, 'icon': 'mdi:blur'},
