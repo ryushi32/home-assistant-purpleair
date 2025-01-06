@@ -1,5 +1,6 @@
 """Constants for the Purple Air integration."""
-from homeassistant.const import UnitOfTemperature, UnitOfPressure, SensorDeviceClass
+from homeassistant.const import UnitOfTemperature, UnitOfPressure
+from homeassistant.components.sensor import SensorDeviceClass
 
 AQI_BREAKPOINTS = {
     'pm2_5': [
