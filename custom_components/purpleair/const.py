@@ -20,7 +20,7 @@ PARTICLE_PROPS = ['pm1_0_atm', 'pm2_5_atm', 'pm10_0_atm']
 SENSORS_MAP = {
     'pm2_5_aqi_a_raw':         {'key': 'pm2_5_aqi_raw',    'uom': SensorDeviceClass.PM25, 'icon': 'mdi:blur-linear'},
     'pm2_5_aqi_b_raw':         {'key': 'pm2_5_aqi_b_raw',  'uom': SensorDeviceClass.PM25, 'icon': 'mdi:blur-linear'},
-    'pm2_5_atm_confidence':    {'key': 'pm2_5_atm_conf',   'uom': SensorDeviceClass.ENUM, 'icon': 'mdi:seal'},
+    'pm2_5_atm_confidence':    {'key': 'pm2_5_atm_conf',   'uom': None, 'icon': 'mdi:seal'},
     'particulate_matter_0_1':  {'key': 'pm1_0_atm',        'uom': SensorDeviceClass.PM1,  'icon': 'mdi:blur'},
     'particulate_matter_2_5':  {'key': 'pm2_5_atm',        'uom': SensorDeviceClass.PM25, 'icon': 'mdi:blur'},
     'particulate_matter_10':   {'key': 'pm10_0_atm',       'uom': SensorDeviceClass.PM10, 'icon': 'mdi:blur'},
