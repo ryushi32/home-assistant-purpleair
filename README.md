@@ -46,10 +46,10 @@ enhance, and redistribute as you see fit.
 
 ## Releases
 
-### 2.0.6
+### 2.0.7
 Update Units
 
-### 2.0.5
+### 2.0.6
 Fix for HA 2025.1 
 
 ### 2.0.4
