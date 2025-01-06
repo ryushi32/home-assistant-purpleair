@@ -46,6 +46,9 @@ enhance, and redistribute as you see fit.
 
 ## Releases
 
+### 2.0.5
+Fix for HA 2025.1 
+
 ### 2.0.4
 Fix string for pm2_5_atm_confidence
 
