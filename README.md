@@ -46,7 +46,7 @@ enhance, and redistribute as you see fit.
 
 ## Releases
 
-### 2.0.7
+### 2.0.8
 Update Units
 
 ### 2.0.6
