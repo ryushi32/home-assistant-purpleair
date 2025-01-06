@@ -1,5 +1,5 @@
 """Constants for the Purple Air integration."""
-from homeassistant.const import ATTR_STATE, CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, PERCENTAGE, UnitOfTemperature, UnitOfPressure, SIGNAL_STRENGTH_DECIBELS_MILLIWATT, STATE_UNKNOWN, STATE_UNAVAILABLE
+from homeassistant.const import UnitOfTemperature, UnitOfPressure, SensorDeviceClass
 
 AQI_BREAKPOINTS = {
     'pm2_5': [
@@ -17,19 +17,19 @@ PARTICLE_PROPS = ['pm1_0_atm', 'pm2_5_atm', 'pm10_0_atm']
 
 # Map of sensors to create entities for
 SENSORS_MAP = {
-    'pm2_5_aqi_a_raw':         {'key': 'pm2_5_aqi_raw',    'uom': None, 'icon': 'mdi:blur-linear'},
-    'pm2_5_aqi_b_raw':         {'key': 'pm2_5_aqi_b_raw',  'uom': None, 'icon': 'mdi:blur-linear'},
+    'pm2_5_aqi_a_raw':         {'key': 'pm2_5_aqi_raw',    'uom': SensorDeviceClass.PM25, 'icon': 'mdi:blur-linear'},
+    'pm2_5_aqi_b_raw':         {'key': 'pm2_5_aqi_b_raw',  'uom': SensorDeviceClass.PM25, 'icon': 'mdi:blur-linear'},
     'pm2_5_atm_confidence':    {'key': 'pm2_5_atm_conf',   'uom': None,             'icon': 'mdi:seal'},
-    'particulate_matter_0_1':  {'key': 'pm1_0_atm',        'uom': CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, 'icon': 'mdi:blur'},
-    'particulate_matter_2_5':  {'key': 'pm2_5_atm',        'uom': CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, 'icon': 'mdi:blur'},
-    'particulate_matter_10':   {'key': 'pm10_0_atm',       'uom': CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, 'icon': 'mdi:blur'},
-    'air_quality_index_epa':   {'key': 'aqi_epa',          'uom': None, 'icon': 'mdi:weather-hazy'},
+    'particulate_matter_0_1':  {'key': 'pm1_0_atm',        'uom': SensorDeviceClass.PM1, 'icon': 'mdi:blur'},
+    'particulate_matter_2_5':  {'key': 'pm2_5_atm',        'uom': SensorDeviceClass.PM25, 'icon': 'mdi:blur'},
+    'particulate_matter_10':   {'key': 'pm10_0_atm',       'uom': SensorDeviceClass.PM10, 'icon': 'mdi:blur'},
+    'air_quality_index_epa':   {'key': 'aqi_epa',          'uom': SensorDeviceClass.AQI, 'icon': 'mdi:weather-hazy'},
     'air_quality_index_lrapa': {'key': 'aqi_lrapa',        'uom': None, 'icon': 'mdi:weather-hazy'},
-    'humidity':                {'key': 'current_humidity', 'uom': PERCENTAGE,       'icon': 'mdi:water-percent'},
+    'humidity':                {'key': 'current_humidity', 'uom': SensorDeviceClass.HUMIDITY,       'icon': 'mdi:water-percent'},
     'temperature':             {'key': 'current_temp',     'uom': UnitOfTemperature.FAHRENHEIT,  'icon': 'mdi:thermometer'},
     'dewpoint':                {'key': 'current_dewpoint', 'uom': UnitOfTemperature.FAHRENHEIT,  'icon': 'mdi:water-outline'},
     'pressure':                {'key': 'pressure',         'uom': UnitOfPressure.HPA,     'icon': 'mdi:gauge'},
-    'rssi':                    {'key': 'rssi',             'uom': SIGNAL_STRENGTH_DECIBELS_MILLIWATT, 'icon': 'mdi:wifi'}
+    'rssi':                    {'key': 'rssi',             'uom': SensorDeviceClass.SIGNAL_STRENGTH, 'icon': 'mdi:wifi'}
 }
 SENSORS_DUAL_ONLY = ['pm2_5_aqi_b_raw']
 
