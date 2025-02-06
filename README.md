@@ -46,6 +46,9 @@ enhance, and redistribute as you see fit.
 
 ## Releases
 
+### 2.1.1
+Add config url to device thanks @zacs
+
 ### 2.1.0
 Update Units
 
