@@ -46,6 +46,7 @@ class PurpleAirQualitySensor(SensorEntity):
     @property
     def device_info(self):
         return {
+           "configuration_url": f'http://{self.pa_ip_address}',
            "identifiers": {
                # Serial numbers are unique identifiers within a specific domain
                (DOMAIN, self.pa_sensor_id),
