@@ -46,6 +46,9 @@ enhance, and redistribute as you see fit.
 
 ## Releases
 
+### 2.1.2
+Fix deprecated async_forward_entry_setup to async_forward_entry_setups
+
 ### 2.1.1
 Add config url to device thanks @zacs
 
