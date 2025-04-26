@@ -46,7 +46,7 @@ enhance, and redistribute as you see fit.
 
 ## Releases
 
-### 2.1.2
+### 2.1.3
 Fix deprecated async_forward_entry_setup to async_forward_entry_setups
 
 ### 2.1.1
