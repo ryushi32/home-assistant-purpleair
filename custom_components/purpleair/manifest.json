@@ -2,6 +2,7 @@
   "domain": "purpleair",
   "name": "PurpleAir (Local)",
   "version": "2.1.2",
+  "homeassistant": "2025.1.0",
   "iot_class": "local_polling",
   "config_flow": true,
   "documentation": "https://github.com/ryushi32/home-assistant-purpleair",
