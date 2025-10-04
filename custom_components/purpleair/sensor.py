@@ -20,6 +20,25 @@ async def async_setup_entry(hass, config_entry, async_schedule_add_entities):
 
     entities = []
     for index, entity_desc in SENSORS_MAP.items():
+        # Ensure humidity sensor uses '%' as unit
+        if entity_desc['key'] == 'current_humidity':
+            entity_desc = dict(entity_desc)
+            entity_desc['uom'] = '%'
+        # Ensure signal_strength sensor uses 'dBm' as unit
+        elif entity_desc['key'] == 'rssi':
+            entity_desc = dict(entity_desc)
+            entity_desc['uom'] = 'dBm'
+        # Ensure particulate matter sensors use 'µg/m³' as unit
+        elif entity_desc['key'] in [
+            'pm1_0_atm', 'pm2_5_atm', 'pm10_0_atm',
+            'pm1_0_atm_b', 'pm2_5_atm_b', 'pm10_0_atm_b',
+            'pm1_0_cf_1', 'pm2_5_cf_1', 'pm10_0_cf_1',
+            'pm1_0_cf_1_b', 'pm2_5_cf_1_b', 'pm10_0_cf_1_b',
+            'pm2_5_aqi_a_raw', 'pm2_5_aqi_a_raw', 'pm2_5_aqi_a_raw',
+            'pm2_5_aqi_b_raw', 'pm2_5_aqi_b_raw', 'pm2_5_aqi_b_raw'
+        ]:
+            entity_desc = dict(entity_desc)
+            entity_desc['uom'] = 'µg/m³'
         if is_dual or entity_desc['key'] not in SENSORS_DUAL_ONLY:
             entities.append(PurpleAirQualitySensor(hass, index, config_entry, entity_desc))
 
