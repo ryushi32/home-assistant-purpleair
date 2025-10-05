@@ -34,9 +34,10 @@ class PurpleAirQualitySensor(SensorEntity):
         self._api = hass.data[DOMAIN]
         self._stop_listening = None
 
-        self._uom = entity_desc['uom']
-        self._icon = entity_desc['icon']
-        self._src_key = entity_desc['key']
+        self._uom = entity_desc.get('uom')
+        self._icon = entity_desc.get('icon')
+        self._src_key = entity_desc.get('key')
+        self._device_class = entity_desc.get('device_class')
 
         self.idx = index
         self.pa_sensor_id = self._data['id']
@@ -63,6 +64,11 @@ class PurpleAirQualitySensor(SensorEntity):
     def native_unit_of_measurement(self):
         """Return the unit of measurement."""
         return self._uom
+
+    @property
+    def device_class(self):
+        """Return the device class."""
+        return self._device_class
 
     @property
     def icon(self):
