@@ -46,6 +46,9 @@ enhance, and redistribute as you see fit.
 
 ## Releases
 
+### 2.1.6
+Fix error from giving AQI a unit. HA wants aqi set to none
+
 ### 2.1.5
 Update units for PPM to μg/m³ Update unit for humidity to % update units for RSSI to dBm.
 
