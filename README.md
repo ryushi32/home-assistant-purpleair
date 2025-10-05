@@ -46,6 +46,9 @@ enhance, and redistribute as you see fit.
 
 ## Releases
 
+### 2.1.5
+Update units for PPM to μg/m³ Update unit for humidity to % update units for RSSI to dBm.
+
 ### 2.1.3
 Fix deprecated async_forward_entry_setup to async_forward_entry_setups
 

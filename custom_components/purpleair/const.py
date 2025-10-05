@@ -18,19 +18,19 @@ PARTICLE_PROPS = ['pm1_0_atm', 'pm2_5_atm', 'pm10_0_atm']
 
 # Map of sensors to create entities for
 SENSORS_MAP = {
-    'pm2_5_aqi_a_raw':         {'key': 'pm2_5_aqi_raw',    'uom': SensorDeviceClass.PM25, 'icon': 'mdi:blur-linear'},
-    'pm2_5_aqi_b_raw':         {'key': 'pm2_5_aqi_b_raw',  'uom': SensorDeviceClass.PM25, 'icon': 'mdi:blur-linear'},
-    'pm2_5_atm_confidence':    {'key': 'pm2_5_atm_conf',   'uom': None, 'icon': 'mdi:seal'},
-    'particulate_matter_0_1':  {'key': 'pm1_0_atm',        'uom': SensorDeviceClass.PM1,  'icon': 'mdi:blur'},
-    'particulate_matter_2_5':  {'key': 'pm2_5_atm',        'uom': SensorDeviceClass.PM25, 'icon': 'mdi:blur'},
-    'particulate_matter_10':   {'key': 'pm10_0_atm',       'uom': SensorDeviceClass.PM10, 'icon': 'mdi:blur'},
-    'air_quality_index_epa':   {'key': 'aqi_epa',          'uom': SensorDeviceClass.AQI,  'icon': 'mdi:weather-hazy'},
-    'air_quality_index_lrapa': {'key': 'aqi_lrapa',        'uom': SensorDeviceClass.AQI,  'icon': 'mdi:weather-hazy'},
-    'humidity':                {'key': 'current_humidity', 'uom': SensorDeviceClass.HUMIDITY,   'icon': 'mdi:water-percent'},
-    'temperature':             {'key': 'current_temp',     'uom': UnitOfTemperature.FAHRENHEIT, 'icon': 'mdi:thermometer'},
-    'dewpoint':                {'key': 'current_dewpoint', 'uom': UnitOfTemperature.FAHRENHEIT, 'icon': 'mdi:water-outline'},
-    'pressure':                {'key': 'pressure',         'uom': UnitOfPressure.HPA,            'icon': 'mdi:gauge'},
-    'rssi':                    {'key': 'rssi',             'uom': SensorDeviceClass.SIGNAL_STRENGTH, 'icon': 'mdi:wifi'}
+    'pm2_5_aqi_a_raw':         {'key': 'pm2_5_aqi_raw',    'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM25, 'icon': 'mdi:blur-linear'},
+    'pm2_5_aqi_b_raw':         {'key': 'pm2_5_aqi_b_raw',  'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM25, 'icon': 'mdi:blur-linear'},
+    'pm2_5_atm_confidence':    {'key': 'pm2_5_atm_conf',   'uom': None, 'device_class': None, 'icon': 'mdi:seal'},
+    'particulate_matter_0_1':  {'key': 'pm1_0_atm',        'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM1,  'icon': 'mdi:blur'},
+    'particulate_matter_2_5':  {'key': 'pm2_5_atm',        'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM25, 'icon': 'mdi:blur'},
+    'particulate_matter_10':   {'key': 'pm10_0_atm',       'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM10, 'icon': 'mdi:blur'},
+    'air_quality_index_epa':   {'key': 'aqi_epa',          'uom': 'aqi', 'device_class': SensorDeviceClass.AQI,  'icon': 'mdi:weather-hazy'},
+    'air_quality_index_lrapa': {'key': 'aqi_lrapa',        'uom': 'aqi', 'device_class': SensorDeviceClass.AQI,  'icon': 'mdi:weather-hazy'},
+    'humidity':                {'key': 'current_humidity', 'uom': '%', 'device_class': SensorDeviceClass.HUMIDITY, 'icon': 'mdi:water-percent'},
+    'temperature':             {'key': 'current_temp',     'uom': UnitOfTemperature.FAHRENHEIT, 'device_class': SensorDeviceClass.TEMPERATURE, 'icon': 'mdi:thermometer'},
+    'dewpoint':                {'key': 'current_dewpoint', 'uom': UnitOfTemperature.FAHRENHEIT, 'device_class': SensorDeviceClass.TEMPERATURE, 'icon': 'mdi:water-outline'},
+    'pressure':                {'key': 'pressure',         'uom': UnitOfPressure.HPA, 'device_class': SensorDeviceClass.PRESSURE, 'icon': 'mdi:gauge'},
+    'rssi':                    {'key': 'rssi',             'uom': 'dBm', 'device_class': SensorDeviceClass.SIGNAL_STRENGTH, 'icon': 'mdi:wifi'}
 }
 SENSORS_DUAL_ONLY = ['pm2_5_aqi_b_raw']
 
