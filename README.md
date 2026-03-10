@@ -19,13 +19,15 @@ To register a new purple air device:
 3. Give it a name.
 
 #### Current Sensors
-This will create 14 entities per device:
+This will create 16 entities per device:
 * Particulate Matter 1.0 (Raw)
 * Particulate Matter 2.5 (Raw)
 * Particulate Matter 2.5 (EPA)
+* Particulate Matter 2.5 (ALT CF=3.4 - Based on 0.3, 0.5, 2.5, 10.0 Particle Counts)
 * Particulate Matter 10.0 (Raw)
 * US Air Quality Index (Calculated using Raw PM2.5)
 * US Air Quality Index (Calculated using EPA PM2.5)
+* US Air Quality Index (Calculated using ALT CF=3.4 PM2.5)
 * Humidity (Operating)
 * Humidity (Estimated)
 * Temperature (Operating)
@@ -48,7 +50,7 @@ enhance, and redistribute as you see fit.
 ## Releases
 
 ### 2.1.7
-Added EPA correction equations for PM2.5. Added logic for outdoor vs indoor sensors. Removed LRAPA AQI calculation. Removed redundant variables. Updated equations for estimated Temperature and RH. Output raw and corrected values for PM2.5, AQI, Temperature, and RH. 
+Added EPA and ALT CF=3.4 correction equations for PM2.5. Added logic for outdoor vs indoor sensors. Removed LRAPA AQI calculation. Removed redundant variables. Updated equations for estimated Temperature and RH. Output raw and corrected values for PM2.5, AQI, Temperature, and RH. 
 
 ### 2.1.6
 Fix error from giving AQI a unit. HA wants aqi set to none
