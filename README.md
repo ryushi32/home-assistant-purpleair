@@ -51,6 +51,9 @@ enhance, and redistribute as you see fit.
 
 ## Releases
 
+### 2.1.9
+Forgot to add comma in const.py.
+
 ### 2.1.8
 Added ouputs for VOC, which is experimental according to PurpleAir. Added placeholder code for 2024 NAAQS AQI Breakpoints. To be implemented in future revision once PurpleAir confirms transitioning to these new guidelines. 
 
