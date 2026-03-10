@@ -241,6 +241,7 @@ def process_pm_readings(json_result, is_dual = False):
 
     readings['aqi_epa_raw_pm'] = calc_aqi(readings['pm2_5_raw'], 'pm2_5')
     readings['aqi_epa_cor_pm'] = calc_aqi(readings['pm2_5_epa'], 'pm2_5')
+    readings['aqi_epa_alt_pm'] = calc_aqi(readings['pm2_5_alt'], 'pm2_5')
 
     return readings
 
