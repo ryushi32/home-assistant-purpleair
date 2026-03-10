@@ -68,17 +68,11 @@ class PurpleAirQualitySensor(SensorEntity):
     @property
     def name(self):
         nice_entity_title = self.idx.replace('_', ' ').title()
-        nice_entity_title = nice_entity_title.replace("Pm1 0", "PM1.0")
-        nice_entity_title = nice_entity_title.replace("Pm2 5", "PM2.5")
-        nice_entity_title = nice_entity_title.replace("Pm10 0", "PM10")
-        nice_entity_title = nice_entity_title.replace("Aqi", "AQI")
-        nice_entity_title = nice_entity_title.replace("Epa", "EPA")
-        nice_entity_title = nice_entity_title.replace("PM1.0 Raw", "PM1.0 (Raw)")
-        nice_entity_title = nice_entity_title.replace("PM2.5 Raw", "PM2.5 (Raw)")
-        nice_entity_title = nice_entity_title.replace("PM10 Raw", "PM10 (Raw)")
+        nice_entity_title = re.sub(r"Pm(\d+)\s(\d)", r"PM\1.\2", nice_entity_title)
+        nice_entity_title = re.sub(r"\b(Rh|Aqi|Epa)\b", lambda m: m.group(1).upper(), nice_entity_title)
+        nice_entity_title = nice_entity_title.replace("Raw", "(Raw)")
         nice_entity_title = nice_entity_title.replace("PM2.5 EPA", "PM2.5 (EPA)")
-        nice_entity_title = nice_entity_title.replace("AQI EPA Raw Pm", "US AQI (Raw PM2.5)")
-        nice_entity_title = nice_entity_title.replace("AQI EPA Cor Pm", "US AQI (EPA PM2.5)")
+        nice_entity_title = re.sub(r"AQI EPA (Raw|Cor) Pm", lambda m: f"US AQI ({'Raw PM2.5' if m.group(1) == 'Raw' else 'EPA PM2.5'})", nice_entity_title)
         return f'{self.pa_sensor_name} {nice_entity_title}'
 
     @property
