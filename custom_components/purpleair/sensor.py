@@ -77,9 +77,17 @@ class PurpleAirQualitySensor(SensorEntity):
     @property
     def name(self):
         nice_entity_title = self.idx.replace('_', ' ').title()
-        if 'air_quality_index' in self.idx:
-            left, last = nice_entity_title.rsplit(' ', 1)
-            nice_entity_title = f'{left} ({last.upper()})'
+        nice_entity_title = nice_entity_title.replace("Pm1 0", "PM1.0")
+        nice_entity_title = nice_entity_title.replace("Pm2 5", "PM2.5")
+        nice_entity_title = nice_entity_title.replace("Pm10 0", "PM10")
+        nice_entity_title = nice_entity_title.replace("Aqi", "AQI")
+        nice_entity_title = nice_entity_title.replace("Epa", "EPA")
+        nice_entity_title = nice_entity_title.replace("PM1.0 Raw", "PM1.0 (Raw)")
+        nice_entity_title = nice_entity_title.replace("PM2.5 Raw", "PM2.5 (Raw)")
+        nice_entity_title = nice_entity_title.replace("PM10 Raw", "PM10 (Raw)")
+        nice_entity_title = nice_entity_title.replace("PM2.5 EPA", "PM2.5 (EPA)")
+        nice_entity_title = nice_entity_title.replace("AQI EPA Raw PM", "US AQI (Raw PM)")
+        nice_entity_title = nice_entity_title.replace("AQI EPA Cor PM", "US AQI (EPA PM)")
         return f'{self.pa_sensor_name} {nice_entity_title}'
 
     @property
