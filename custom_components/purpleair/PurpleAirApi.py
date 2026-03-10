@@ -7,8 +7,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval, async_track_point_in_utc_time
 from homeassistant.util import dt
 
-from .const import AQI_BREAKPOINTS, DISPATCHER_PURPLE_AIR, PARTICLE_PROPS, LOCAL_SCAN_INTERVAL, LOCAL_URL_FORMAT, \
-    TEMP_ADJUSTMENT, HUMIDITY_ADJUSTMENT
+from .const import AQI_BREAKPOINTS, DISPATCHER_PURPLE_AIR, PARTICLE_PROPS, LOCAL_SCAN_INTERVAL, LOCAL_URL_FORMAT
 
 _LOGGER = logging.getLogger(__name__)
 
