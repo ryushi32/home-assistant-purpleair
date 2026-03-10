@@ -81,6 +81,7 @@ class PurpleAirQualitySensor(SensorEntity):
         nice_entity_title = nice_entity_title.replace("PM2.5 Alt", "PM2.5 (ALT CF=3.4)")
         nice_entity_title = nice_entity_title.replace("AQI EPA Raw Pm", "US AQI (Raw PM2.5)")
         nice_entity_title = nice_entity_title.replace("AQI EPA Cor Pm", "US AQI (EPA PM2.5)")
+        nice_entity_title = nice_entity_title.replace("AQI EPA Alt Pm", "US AQI (ALT CF=3.4)")
         return f'{self.pa_sensor_name} {nice_entity_title}'
 
     @property
