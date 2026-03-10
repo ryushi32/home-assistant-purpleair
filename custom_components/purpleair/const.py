@@ -59,7 +59,7 @@ SENSORS_MAP = {
     'pressure':                {'key': 'pressure',         'uom': UnitOfPressure.HPA, 'device_class': SensorDeviceClass.PRESSURE, 'icon': 'mdi:gauge'},
     'rssi':                    {'key': 'rssi',             'uom': 'dBm', 'device_class': SensorDeviceClass.SIGNAL_STRENGTH, 'icon': 'mdi:wifi'},
     'voc_iaq_index':           {'key': 'gas_680',          'uom': None, 'device_class': None, 'icon': 'mdi:flask-outline'},
-    'voc_iaq_class':           {'key': 'voc_iaq_class',    'uom': None, 'device_class': None, 'icon': 'mdi:home-air-filter'}
+    'voc_iaq_class':           {'key': 'voc_iaq_class',    'uom': None, 'device_class': None, 'icon': 'mdi:home-air-filter'},
 }
 
 MANUFACTURER = 'Purple Air'
