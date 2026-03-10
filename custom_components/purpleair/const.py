@@ -57,7 +57,7 @@ SENSORS_MAP = {
     'dewpoint':                {'key': 'current_dewpoint', 'uom': UnitOfTemperature.FAHRENHEIT, 'device_class': SensorDeviceClass.TEMPERATURE, 'icon': 'mdi:water-outline'},
     'pressure':                {'key': 'pressure',         'uom': UnitOfPressure.HPA, 'device_class': SensorDeviceClass.PRESSURE, 'icon': 'mdi:gauge'},
     'rssi':                    {'key': 'rssi',             'uom': 'dBm', 'device_class': SensorDeviceClass.SIGNAL_STRENGTH, 'icon': 'mdi:wifi'}
-    'voc_experimental':        {'key': 'gas_680',          'uom': None, 'device_class': None, 'icon': 'mdi:flask-outline'},
+    'voc_iaq_index':           {'key': 'gas_680',          'uom': None, 'device_class': None, 'icon': 'mdi:flask-outline'},
     'voc_iaq_class':           {'key': 'voc_iaq_class',    'uom': None, 'device_class': None, 'icon': 'mdi:home-air-filter'},
 }
 
