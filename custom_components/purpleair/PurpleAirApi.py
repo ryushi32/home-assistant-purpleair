@@ -112,13 +112,20 @@ def calc_dewpoint(temp_f, humidity):
 
 def process_heat_adjustments(json_result):
     """Since the purple air devices are affected by heat from itself, modify readings to account for difference"""
-    new_temp = json_result['current_temp_f'] + TEMP_ADJUSTMENT
-    new_humid = min(100, json_result['current_humidity'] + HUMIDITY_ADJUSTMENT)
+    raw_temp = float(json_result['current_temp_f'])
+    raw_rh = float(json_result['current_humidity'])
+
+    # Estimated corrections devloped by Lance Wallace for PurpleAir Map
+    temp_est = round((1.0227 * raw_temp) - 9.3755, 1)
+    rh_est = round((1.4498 * raw_rh) + 7.022, 1)
+    rh_est = max(0.0, min(100.0, rh_est))
 
     return {
-        'current_temp': new_temp,
-        'current_humidity': new_humid,
-        'current_dewpoint': calc_dewpoint(new_temp, new_humid)
+        'temp_operating': raw_temp,
+        'rh_operating': raw_rh,
+        'temp_estimated': temp_est,
+        'rh_estimated': rh_est,
+        'current_dewpoint': calc_dewpoint(temp_est, rh_est)
     }
 
 
@@ -292,11 +299,7 @@ class PurpleAirApi:
             nodes[pa_sensor_id] = {
                 'device_location': result['place'],
                 'rssi': result['rssi'],
-                'current_temp_raw': result['current_temp_f'],
-                'current_humidity_raw': result['current_humidity'],
-                'current_dewpoint_raw': result['current_dewpoint_f'],
                 'pressure': result['pressure'],
-                'is_dual': is_dual
             }
             nodes[pa_sensor_id].update(process_pm_readings(result, is_dual))
             nodes[pa_sensor_id].update(process_heat_adjustments(result))
