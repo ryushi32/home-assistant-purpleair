@@ -77,8 +77,8 @@ class PurpleAirQualitySensor(SensorEntity):
         nice_entity_title = nice_entity_title.replace("PM2.5 Raw", "PM2.5 (Raw)")
         nice_entity_title = nice_entity_title.replace("PM10 Raw", "PM10 (Raw)")
         nice_entity_title = nice_entity_title.replace("PM2.5 EPA", "PM2.5 (EPA)")
-        nice_entity_title = nice_entity_title.replace("AQI EPA Raw PM", "US AQI (Raw PM)")
-        nice_entity_title = nice_entity_title.replace("AQI EPA Cor PM", "US AQI (EPA PM)")
+        nice_entity_title = nice_entity_title.replace("AQI EPA Raw Pm", "US AQI (Raw PM)")
+        nice_entity_title = nice_entity_title.replace("AQI EPA Cor Pm", "US AQI (EPA PM)")
         return f'{self.pa_sensor_name} {nice_entity_title}'
 
     @property
