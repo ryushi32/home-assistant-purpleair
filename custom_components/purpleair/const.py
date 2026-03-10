@@ -29,12 +29,13 @@ AQI_BREAKPOINTS = {
 #}
 
 VOC_IAQ_BREAKPOINTS = [
-    { 'low': 0,   'high': 50,  'label': 'Good' },
-    { 'low': 51,  'high': 100, 'label': 'Average' },
-    { 'low': 101, 'high': 150, 'label': 'Little Bad' },
-    { 'low': 151, 'high': 200, 'label': 'Bad' },
-    { 'low': 201, 'high': 300, 'label': 'Worse' },
-    { 'low': 301, 'high': 500, 'label': 'Very Bad' },
+    { 'low': 0,   'high': 50,  'label': 'Excellent' },
+    { 'low': 51,  'high': 100, 'label': 'Good' },
+    { 'low': 101, 'high': 150, 'label': 'Lightly Polluted' },
+    { 'low': 151, 'high': 200, 'label': 'Moderately Polluted' },
+    { 'low': 201, 'high': 250, 'label': 'Heavily Polluted' },
+    { 'low': 251, 'high': 350, 'label': 'Severely Polluted' },
+    { 'low': 351, 'high': 500, 'label': 'Extremely Polluted' },
 ]
 
 PARTICLE_PROPS = ['pm1_0_atm', 'pm2_5_atm', 'pm10_0_atm', 'pm1_0_cf_1', 'pm2_5_cf_1', 'pm10_0_cf_1']
