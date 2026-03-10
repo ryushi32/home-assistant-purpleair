@@ -33,6 +33,56 @@ def calc_aqi(value, index):
 def lrapa(value):
     return max(0, 0.5 * value - 0.66)
 
+# EPA Correction for Outdoor Sensors
+def epa_pm25_correction_outdoor(pm25_atm, humidity):
+
+    if pm25_atm is None:
+        return None
+
+    x = float(pm25_atm)
+    rh = 0.0 if humidity is None else max(0.0, min(100.0, float(humidity)))
+
+    if x < 30:
+        y = 0.524 * x - 0.0862 * rh + 5.75
+    elif x < 50:
+        w = (x / 20.0) - 1.5
+        y = ((0.786 * w) + (0.524 * (1 - w))) * x - 0.0862 * rh + 5.75
+    elif x < 210:
+        y = 0.786 * x - 0.0862 * rh + 5.75
+    elif x < 260:
+        w = (x / 50.0) - (21.0 / 5.0)
+        y = (
+            ((0.69 * w) + (0.786 * (1 - w))) * x
+            - 0.0862 * rh * (1 - w)
+            + 2.966 * w
+            + 5.75 * (1 - w)
+            + 8.84e-4 * (x ** 2) * w
+        )
+    else:
+        y = 2.966 + 0.69 * x + 8.84e-4 * (x ** 2)
+
+    return round(max(0.0, y), 1)
+
+# EPA Correction for Indoor Sensors
+def epa_pm25_correction_indoor(pm25_cf1, humidity):
+
+    if pm25_cf1 is None:
+        return None
+
+    x = float(pm25_cf1)
+    rh = 0.0 if humidity is None else max(0.0, min(100.0, float(humidity)))
+
+    if x < 570:
+        y = 0.524 * x - 0.0862 * rh + 5.75
+    elif x < 611:
+        w = 0.0244 * x - 13.9
+        eq1 = 0.524 * x - 0.0862 * rh + 5.75
+        eq3 = 4.21e-4 * (x ** 2) + 0.392 * x + 3.44
+        y = w * eq3 + (1 - w) * eq1
+    else:
+        y = 4.21e-4 * (x ** 2) + 0.392 * x + 3.44
+
+    return round(max(0.0, y), 1)
 
 def calc_dewpoint(temp_f, humidity):
     """
@@ -84,6 +134,14 @@ def process_pm_readings(json_result, is_dual = False):
         readings[prop] = value
         readings[f'{prop}_conf'] = confidence
 
+    humidity_raw = json_result.get('current_humidity')
+    place = str(json_result.get('place', '')).strip().lower()
+
+    if place == 'inside':
+        readings['pm2_5_epa'] = epa_pm25_correction_indoor(readings['pm2_5_cf_1'], humidity_raw)
+    else:
+        readings['pm2_5_epa'] = epa_pm25_correction_outdoor(readings['pm2_5_atm'], humidity_raw)
+        
     readings['aqi_epa'] = calc_aqi(readings['pm2_5_atm'], 'pm2_5')
     readings['aqi_lrapa'] = calc_aqi(lrapa(readings['pm2_5_atm']), 'pm2_5')
     return readings
