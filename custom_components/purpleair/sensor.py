@@ -95,6 +95,8 @@ class PurpleAirQualitySensor(SensorEntity):
 
     @property
     def state_class(self):
+        if self.idx == "voc_iaq_index":
+            return "measurement"
         return 'measurement' if self._uom is not None else None
 
     @property
