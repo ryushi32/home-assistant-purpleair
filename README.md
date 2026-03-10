@@ -51,6 +51,9 @@ enhance, and redistribute as you see fit.
 
 ## Releases
 
+### 2.1.10
+Changed VOC state class to measurement so it can be graphed in Home Assistant.
+
 ### 2.1.9
 Forgot to add comma in const.py.
 
