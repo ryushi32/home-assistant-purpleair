@@ -26,6 +26,7 @@ SENSORS_MAP = {
     'pm10_0_raw':              {'key': 'pm10_0_raw',       'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM10, 'icon': 'mdi:blur'},
     'aqi_epa_raw_pm':          {'key': 'aqi_epa_raw_pm',   'uom': None, 'device_class': SensorDeviceClass.AQI, 'icon': 'mdi:weather-hazy'},
     'aqi_epa_cor_pm':          {'key': 'aqi_epa_cor_pm',   'uom': None, 'device_class': SensorDeviceClass.AQI, 'icon': 'mdi:weather-hazy'},
+    'aqi_epa_alt_pm':          {'key': 'aqi_epa_alt_pm',   'uom': None, 'device_class': SensorDeviceClass.AQI, 'icon': 'mdi:weather-hazy'},
     'rh_operating':            {'key': 'rh_operating',     'uom': '%', 'device_class': SensorDeviceClass.HUMIDITY, 'icon': 'mdi:water-percent'},
     'rh_estimated':            {'key': 'rh_estimated',     'uom': '%', 'device_class': SensorDeviceClass.HUMIDITY, 'icon': 'mdi:water-percent'},
     'temp_operating':          {'key': 'temp_operating',   'uom': UnitOfTemperature.FAHRENHEIT, 'device_class': SensorDeviceClass.TEMPERATURE, 'icon': 'mdi:thermometer'},
