@@ -67,6 +67,7 @@ class PurpleAirQualitySensor(SensorEntity):
 
     @property
     def name(self):
+        nice_entity_title = self.idx.replace('_', ' ').title()
         nice_entity_title = nice_entity_title.replace("Pm1 0", "PM1.0")
         nice_entity_title = nice_entity_title.replace("Pm2 5", "PM2.5")
         nice_entity_title = nice_entity_title.replace("Pm10 0", "PM10")
