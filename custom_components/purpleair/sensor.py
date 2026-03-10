@@ -86,7 +86,7 @@ class PurpleAirQualitySensor(SensorEntity):
         nice_entity_title = nice_entity_title.replace("Voc Iaq Class", "VOC IAQ Class")
         nice_entity_title = nice_entity_title.replace("Estimated", "(Estimated)")
         nice_entity_title = nice_entity_title.replace("Operating", "(Operating)")
-        nice_entity_title = nice_entity_title.replace("Rssi", "WiFi Signal Strength (RSSI)")
+        nice_entity_title = nice_entity_title.replace("Rssi", "WiFi Signal (RSSI)")
         return f'{self.pa_sensor_name} {nice_entity_title}'
 
     @property
