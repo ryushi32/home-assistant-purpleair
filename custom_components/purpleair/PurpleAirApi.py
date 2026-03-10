@@ -380,7 +380,7 @@ class PurpleAirApi:
         for result in results:
             pa_sensor_id = result['SensorId']
             is_dual = 'pm2.5_aqi_b' in result
-            gas_680 = float(result['gas_680'])
+            gas_680 = round(float(result['gas_680']))
             nodes[pa_sensor_id] = {
                 'device_location': result['place'],
                 'rssi': result['rssi'],
