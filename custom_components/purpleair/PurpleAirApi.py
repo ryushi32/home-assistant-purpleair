@@ -29,10 +29,6 @@ def calc_aqi(value, index):
     return round((aqi_range/pm_range) * c + bp['aqi_low'])
 
 
-# LRAPA conversion using the same formula as used by PurpleAir's map as of 2020-09-06
-def lrapa(value):
-    return max(0, 0.5 * value - 0.66)
-
 # EPA Correction for Outdoor Sensors
 def epa_pm25_correction_outdoor(pm25_atm, humidity):
 
@@ -83,6 +79,20 @@ def epa_pm25_correction_indoor(pm25_cf1, humidity):
         y = 4.21e-4 * (x ** 2) + 0.392 * x + 3.44
 
     return round(max(0.0, y), 1)
+
+# Apply EPA Correction to Individual Sensors and Average
+def average_corrected(a_value, b_value, humidity, correction_fn):
+    a_corr = correction_fn(a_value, humidity)
+    b_corr = correction_fn(b_value, humidity)
+
+    if a_corr is None and b_corr is None:
+        return None
+    if a_corr is None:
+        return round(b_corr, 1)
+    if b_corr is None:
+        return round(a_corr, 1)
+
+    return round((a_corr + b_corr) / 2.0, 1)
 
 def calc_dewpoint(temp_f, humidity):
     """
@@ -138,12 +148,40 @@ def process_pm_readings(json_result, is_dual = False):
     place = str(json_result.get('place', '')).strip().lower()
 
     if place == 'inside':
-        readings['pm2_5_epa'] = epa_pm25_correction_indoor(readings['pm2_5_cf_1'], humidity_raw)
+        readings['pm1_0_raw'] = readings.get('pm1_0_cf_1')
+        readings['pm2_5_raw'] = readings.get('pm2_5_cf_1')
+        readings['pm10_0_raw'] = readings.get('pm10_0_cf_1')
+        readings['pm2_5_raw_conf'] = readings.get('pm2_5_cf_1_conf')
+
+        if is_dual and 'pm2_5_cf_1_b' in json_result:
+            readings['pm2_5_epa'] = average_corrected(
+                json_result.get('pm2_5_cf_1'),
+                json_result.get('pm2_5_cf_1_b'),
+                humidity_raw,
+                epa_pm25_correction_indoor
+            )
+        else:
+            readings['pm2_5_epa'] = round(epa_pm25_correction_indoor(readings.get('pm2_5_cf_1'), humidity_raw), 1)
+
     else:
-        readings['pm2_5_epa'] = epa_pm25_correction_outdoor(readings['pm2_5_atm'], humidity_raw)
-        
-    readings['aqi_epa'] = calc_aqi(readings['pm2_5_atm'], 'pm2_5')
-    readings['aqi_lrapa'] = calc_aqi(lrapa(readings['pm2_5_atm']), 'pm2_5')
+        readings['pm1_0_raw'] = readings.get('pm1_0_atm')
+        readings['pm2_5_raw'] = readings.get('pm2_5_atm')
+        readings['pm10_0_raw'] = readings.get('pm10_0_atm')
+        readings['pm2_5_raw_conf'] = readings.get('pm2_5_atm_conf')
+
+        if is_dual and 'pm2_5_atm_b' in json_result:
+            readings['pm2_5_epa'] = average_corrected(
+                json_result.get('pm2_5_atm'),
+                json_result.get('pm2_5_atm_b'),
+                humidity_raw,
+                epa_pm25_correction_outdoor
+            )
+        else:
+            readings['pm2_5_epa'] = round(epa_pm25_correction_outdoor(readings.get('pm2_5_atm'), humidity_raw), 1)
+
+    readings['aqi_epa_raw_pm'] = calc_aqi(readings['pm2_5_raw'], 'pm2_5')
+    readings['aqi_epa_cor_pm'] = calc_aqi(readings['pm2_5_epa'], 'pm2_5')
+
     return readings
 
 def process_dual_sensor_readings(a, b):
