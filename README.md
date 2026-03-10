@@ -33,8 +33,7 @@ This will create 12 entities per device:
 * RSSI
 * PM 2.5 Confidence Level (Good, Questionable or Severe).
 
-Sensor data queried from local device is an average of the last 2 minutes, i.e. json?live=false
-For Home Assistant, data is polled every 30 seconds
+Sensor data queried from local device is an average of the last 2 minutes, not live data - i.e. "json?live=false". For Home Assistant, data is polled every 30 seconds
 
 ##### Adjusted Sensors
 In a similar manner to the actual purple air website, some sensors are adjusted manually to take into
