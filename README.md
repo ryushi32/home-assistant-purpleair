@@ -19,7 +19,7 @@ To register a new purple air device:
 3. Give it a name.
 
 #### Current Sensors
-This will create 16 entities per device:
+This will create 18 entities per device:
 * Particulate Matter 1.0 (Raw)
 * Particulate Matter 2.5 (Raw)
 * Particulate Matter 2.5 (EPA)
@@ -34,8 +34,10 @@ This will create 16 entities per device:
 * Temperature (Estimated)
 * Dewpoint (Adjusted sensor: re-calculated to take temp & humidity adjustments)
 * Pressure
-* RSSI
+* WiFi Signal Strength (RSSI)
 * PM 2.5 Confidence Level (Good, Questionable or Severe).
+* VOC IAQ Index for Bosch BME680/688 Sensor
+* VOC IAQ Class for Bosch BME680/688 Sensor
 
 Sensor data queried from local device is an average of the last 2 minutes, not live data - i.e. "json?live=false". For Home Assistant, data is polled every 30 seconds
 
@@ -48,6 +50,9 @@ This component is licensed under the MIT license, so feel free to copy,
 enhance, and redistribute as you see fit.
 
 ## Releases
+
+### 2.1.8
+Added ouputs for VOC, which is experimental according to PurpleAir. Added placeholder code for 2024 NAAQS AQI Breakpoints. To be implemented in future revision once PurpleAir confirms transitioning to these new guidelines.
 
 ### 2.1.7
 Added EPA and ALT CF=3.4 correction equations for PM2.5. Added logic for outdoor vs indoor sensors. Removed LRAPA AQI calculation. Removed redundant variables. Updated equations for estimated Temperature and RH. Output raw and corrected values for PM2.5, AQI, Temperature, and RH. 
