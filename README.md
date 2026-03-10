@@ -35,7 +35,7 @@ This will create 18 entities per device:
 * Dewpoint (Adjusted sensor: re-calculated to take temp & humidity adjustments)
 * Pressure
 * WiFi Signal Strength (RSSI)
-* PM 2.5 Confidence Level (Good, Questionable or Severe).
+* PM 2.5 Confidence Level (Good, Questionable or Severe)
 * VOC IAQ Index for Bosch BME680/688 Sensor
 * VOC IAQ Class for Bosch BME680/688 Sensor
 
@@ -52,7 +52,7 @@ enhance, and redistribute as you see fit.
 ## Releases
 
 ### 2.1.8
-Added ouputs for VOC, which is experimental according to PurpleAir. Added placeholder code for 2024 NAAQS AQI Breakpoints. To be implemented in future revision once PurpleAir confirms transitioning to these new guidelines.
+Added ouputs for VOC, which is experimental according to PurpleAir. Added placeholder code for 2024 NAAQS AQI Breakpoints. To be implemented in future revision once PurpleAir confirms transitioning to these new guidelines. 
 
 ### 2.1.7
 Added EPA and ALT CF=3.4 correction equations for PM2.5. Added logic for outdoor vs indoor sensors. Removed LRAPA AQI calculation. Removed redundant variables. Updated equations for estimated Temperature and RH. Output raw and corrected values for PM2.5, AQI, Temperature, and RH. 
