@@ -206,7 +206,8 @@ def process_pm_readings(json_result, is_dual = False):
         )
 
     readings['pm2_5_alt'] = average_pm25_alt(a_counts, b_counts)
-    
+
+    # PM2.5 with EPA Adjutment for Indoor or Outdoor Sensors
     if place == 'inside':
         readings['pm1_0_raw'] = readings.get('pm1_0_cf_1')
         readings['pm2_5_raw'] = readings.get('pm2_5_cf_1')
@@ -239,6 +240,7 @@ def process_pm_readings(json_result, is_dual = False):
         else:
             readings['pm2_5_epa'] = round(epa_pm25_correction_outdoor(readings.get('pm2_5_atm'), humidity_raw), 1)
 
+    # Calculate AQI using PM2.5 Values
     readings['aqi_epa_raw_pm'] = calc_aqi(readings['pm2_5_raw'], 'pm2_5')
     readings['aqi_epa_cor_pm'] = calc_aqi(readings['pm2_5_epa'], 'pm2_5')
     readings['aqi_epa_alt_pm'] = calc_aqi(readings['pm2_5_alt'], 'pm2_5')
