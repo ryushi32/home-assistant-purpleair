@@ -25,8 +25,10 @@ SENSORS_MAP = {
     'pm10_0_raw':              {'key': 'pm10_0_raw',       'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM10, 'icon': 'mdi:blur'},
     'aqi_epa_raw_pm':          {'key': 'aqi_epa_raw_pm',   'uom': None, 'device_class': SensorDeviceClass.AQI, 'icon': 'mdi:weather-hazy'},
     'aqi_epa_cor_pm':          {'key': 'aqi_epa_cor_pm',   'uom': None, 'device_class': SensorDeviceClass.AQI, 'icon': 'mdi:weather-hazy'},
-    'relative_humidity':       {'key': 'current_humidity', 'uom': '%', 'device_class': SensorDeviceClass.HUMIDITY, 'icon': 'mdi:water-percent'},
-    'temperature':             {'key': 'current_temp',     'uom': UnitOfTemperature.FAHRENHEIT, 'device_class': SensorDeviceClass.TEMPERATURE, 'icon': 'mdi:thermometer'},
+    'rh_operating':            {'key': 'rh_operating',     'uom': '%', 'device_class': SensorDeviceClass.HUMIDITY, 'icon': 'mdi:water-percent'},
+    'rh_estimated':            {'key': 'rh_estimated',     'uom': '%', 'device_class': SensorDeviceClass.HUMIDITY, 'icon': 'mdi:water-percent'},
+    'temp_operating':          {'key': 'temp_operating',   'uom': UnitOfTemperature.FAHRENHEIT, 'device_class': SensorDeviceClass.TEMPERATURE, 'icon': 'mdi:thermometer'},
+    'temp_estimated':          {'key': 'temp_estimated',   'uom': UnitOfTemperature.FAHRENHEIT, 'device_class': SensorDeviceClass.TEMPERATURE, 'icon': 'mdi:thermometer'},
     'dewpoint':                {'key': 'current_dewpoint', 'uom': UnitOfTemperature.FAHRENHEIT, 'device_class': SensorDeviceClass.TEMPERATURE, 'icon': 'mdi:water-outline'},
     'pressure':                {'key': 'pressure',         'uom': UnitOfPressure.HPA, 'device_class': SensorDeviceClass.PRESSURE, 'icon': 'mdi:gauge'},
     'rssi':                    {'key': 'rssi',             'uom': 'dBm', 'device_class': SensorDeviceClass.SIGNAL_STRENGTH, 'icon': 'mdi:wifi'}
