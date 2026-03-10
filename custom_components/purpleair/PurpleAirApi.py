@@ -7,7 +7,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval, async_track_point_in_utc_time
 from homeassistant.util import dt
 
-from .const import AQI_BREAKPOINTS, DISPATCHER_PURPLE_AIR, PARTICLE_PROPS, LOCAL_SCAN_INTERVAL, LOCAL_URL_FORMAT
+from .const import AQI_BREAKPOINTS, VOC_IAQ_BREAKPOINTS, DISPATCHER_PURPLE_AIR, PARTICLE_PROPS, LOCAL_SCAN_INTERVAL, LOCAL_URL_FORMAT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,6 +26,30 @@ def calc_aqi(value, index):
     pm_range = bp['pm_high'] - bp['pm_low']
     c = value - bp['pm_low']
     return round((aqi_range/pm_range) * c + bp['aqi_low'])
+
+
+def get_aqi_category(aqi_value, index):
+    if aqi_value is None or index not in AQI_BREAKPOINTS:
+        return None
+
+    for bp in AQI_BREAKPOINTS[index]:
+        if bp['aqi_low'] <= aqi_value <= bp['aqi_high']:
+            return bp.get('label')
+
+    return None
+
+
+def classify_voc_iaq(value):
+    if value is None:
+        return None
+
+    x = float(value)
+
+    for bp in VOC_IAQ_BREAKPOINTS:
+        if bp['low'] <= x <= bp['high']:
+            return bp['label']
+
+    return None
 
 
 # EPA Correction for Outdoor Sensors
@@ -245,6 +269,10 @@ def process_pm_readings(json_result, is_dual = False):
     readings['aqi_epa_cor_pm'] = calc_aqi(readings['pm2_5_epa'], 'pm2_5')
     readings['aqi_epa_alt_pm'] = calc_aqi(readings['pm2_5_alt'], 'pm2_5')
 
+    readings['aqi_epa_raw_pm_category'] = get_aqi_category(readings['aqi_epa_raw_pm'], 'pm2_5')
+    readings['aqi_epa_cor_pm_category'] = get_aqi_category(readings['aqi_epa_cor_pm'], 'pm2_5')
+    readings['aqi_epa_alt_pm_category'] = get_aqi_category(readings['aqi_epa_alt_pm'], 'pm2_5')
+
     return readings
 
 def process_dual_sensor_readings(a, b):
@@ -352,10 +380,13 @@ class PurpleAirApi:
         for result in results:
             pa_sensor_id = result['SensorId']
             is_dual = 'pm2.5_aqi_b' in result
+            gas_680 = result['gas_680']
             nodes[pa_sensor_id] = {
                 'device_location': result['place'],
                 'rssi': result['rssi'],
                 'pressure': result['pressure'],
+                'gas_680': gas_680,
+                'voc_iaq_class': classify_voc_iaq(gas_680),
             }
             nodes[pa_sensor_id].update(process_pm_readings(result, is_dual))
             nodes[pa_sensor_id].update(process_heat_adjustments(result))
