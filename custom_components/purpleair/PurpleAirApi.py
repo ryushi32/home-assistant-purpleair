@@ -93,6 +93,41 @@ def average_corrected(a_value, b_value, humidity, correction_fn):
 
     return round((a_corr + b_corr) / 2.0, 1)
 
+# Alternative CF-3.4 Correction for PM2.5
+def pm25_alt_from_counts(p03, p05, p10, p25):
+    """Calculate PurpleAir ALT PM2.5 (cf=3.4) from cumulative particle counts per dL."""
+    if None in (p03, p05, p10, p25):
+        return None
+
+    p03 = float(p03)
+    p05 = float(p05)
+    p10 = float(p10)
+    p25 = float(p25)
+
+    # Counts within each size band
+    n1 = p03 - p05       # 0.3–0.5 µm
+    n2 = p05 - p10       # 0.5–1.0 µm
+    n3 = p10 - p25       # 1.0–2.5 µm
+
+    pm25_alt = 3.4 * (0.00030418 * n1 + 0.0018512 * n2 +0.02069706 * n3)
+
+    return round(max(0.0, pm25_alt), 1)
+
+# Apply Alternative CF-3.4 Correction to Individual Sensors and Average
+def average_pm25_alt(a_counts, b_counts=None):
+    """Calculate PM2.5 ALT for single or dual sensors."""
+    a_alt = pm25_alt_from_counts(*a_counts) if a_counts else None
+    b_alt = pm25_alt_from_counts(*b_counts) if b_counts else None
+
+    if a_alt is None and b_alt is None:
+        return None
+    if a_alt is None:
+        return b_alt
+    if b_alt is None:
+        return a_alt
+
+    return round((a_alt + b_alt) / 2.0, 1)
+
 def calc_dewpoint(temp_f, humidity):
     """
     Calculate dewpoint using August-Roche-Magnus approximation.
@@ -153,6 +188,25 @@ def process_pm_readings(json_result, is_dual = False):
     humidity_raw = json_result.get('current_humidity')
     place = str(json_result.get('place', '')).strip().lower()
 
+    # PM2.5 ALT (cf=3.4) from particle counts
+    a_counts = (
+        json_result.get('p_0_3_um'),
+        json_result.get('p_0_5_um'),
+        json_result.get('p_1_0_um'),
+        json_result.get('p_2_5_um'),
+    )
+
+    b_counts = None
+    if is_dual:
+        b_counts = (
+            json_result.get('p_0_3_um_b'),
+            json_result.get('p_0_5_um_b'),
+            json_result.get('p_1_0_um_b'),
+            json_result.get('p_2_5_um_b'),
+        )
+
+    readings['pm2_5_alt'] = average_pm25_alt(a_counts, b_counts)
+    
     if place == 'inside':
         readings['pm1_0_raw'] = readings.get('pm1_0_cf_1')
         readings['pm2_5_raw'] = readings.get('pm2_5_cf_1')
