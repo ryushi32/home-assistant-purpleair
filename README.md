@@ -1,6 +1,6 @@
 ## Local Purple Air Integration
-This is an integration for home assistant that works integrates with local
-polling on your PurpleAir devices on your local network.
+This is an integration for home assistant that polls sensor data from PurpleAir 
+devices on your local network.
 
 _Code adapted from https://github.com/catchdave/home-assistant-purpleair_
 
@@ -19,22 +19,25 @@ To register a new purple air device:
 3. Give it a name.
 
 #### Current Sensors
-This will create 12 or 13 entities per device:
-* Particulate Matter 0.1
-* Particulate Matter 2.5
-* Particulate Matter 10
-* Air Quality Index (EPA)
-* Air Quality Index (LRAPA)
-* Humidity (Adjusted sensor: +4%)
-* Temperature (Adjusted sensor: -8F)
+This will create 16 entities per device:
+* Particulate Matter 1.0 (Raw)
+* Particulate Matter 2.5 (Raw)
+* Particulate Matter 2.5 (EPA)
+* Particulate Matter 2.5 (ALT CF=3.4 - Based on 0.3, 0.5, 2.5, 10.0 Particle Counts)
+* Particulate Matter 10.0 (Raw)
+* US Air Quality Index (Calculated using Raw PM2.5)
+* US Air Quality Index (Calculated using EPA PM2.5)
+* US Air Quality Index (Calculated using ALT CF=3.4 PM2.5)
+* Humidity (Operating)
+* Humidity (Estimated)
+* Temperature (Operating)
+* Temperature (Estimated)
 * Dewpoint (Adjusted sensor: re-calculated to take temp & humidity adjustments)
 * Pressure
 * RSSI
-* Particulate Matter 2.5 Aqi Raw value (sensor A)
-* Particulate Matter 2.5 Aqi Raw value (sensor B -- only for devices that have two)
 * PM 2.5 Confidence Level (Good, Questionable or Severe).
 
-Sensor data on PurpleAir is updated every 60 seconds.
+Sensor data queried from local device is an average of the last 2 minutes, not live data - i.e. "json?live=false". For Home Assistant, data is polled every 30 seconds
 
 ##### Adjusted Sensors
 In a similar manner to the actual purple air website, some sensors are adjusted manually to take into
@@ -45,6 +48,9 @@ This component is licensed under the MIT license, so feel free to copy,
 enhance, and redistribute as you see fit.
 
 ## Releases
+
+### 2.1.7
+Added EPA and ALT CF=3.4 correction equations for PM2.5. Added logic for outdoor vs indoor sensors. Removed LRAPA AQI calculation. Removed redundant variables. Updated equations for estimated Temperature and RH. Output raw and corrected values for PM2.5, AQI, Temperature, and RH. 
 
 ### 2.1.6
 Fix error from giving AQI a unit. HA wants aqi set to none

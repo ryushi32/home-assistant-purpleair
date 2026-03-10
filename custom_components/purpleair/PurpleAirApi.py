@@ -7,8 +7,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval, async_track_point_in_utc_time
 from homeassistant.util import dt
 
-from .const import AQI_BREAKPOINTS, DISPATCHER_PURPLE_AIR, PARTICLE_PROPS, LOCAL_SCAN_INTERVAL, LOCAL_URL_FORMAT, \
-    TEMP_ADJUSTMENT, HUMIDITY_ADJUSTMENT
+from .const import AQI_BREAKPOINTS, DISPATCHER_PURPLE_AIR, PARTICLE_PROPS, LOCAL_SCAN_INTERVAL, LOCAL_URL_FORMAT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,10 +28,105 @@ def calc_aqi(value, index):
     return round((aqi_range/pm_range) * c + bp['aqi_low'])
 
 
-# LRAPA conversion using the same formula as used by PurpleAir's map as of 2020-09-06
-def lrapa(value):
-    return max(0, 0.5 * value - 0.66)
+# EPA Correction for Outdoor Sensors
+def epa_pm25_correction_outdoor(pm25_atm, humidity):
 
+    if pm25_atm is None:
+        return None
+
+    x = float(pm25_atm)
+    rh = 0.0 if humidity is None else max(0.0, min(100.0, float(humidity)))
+
+    if x < 30:
+        y = 0.524 * x - 0.0862 * rh + 5.75
+    elif x < 50:
+        w = (x / 20.0) - 1.5
+        y = ((0.786 * w) + (0.524 * (1 - w))) * x - 0.0862 * rh + 5.75
+    elif x < 210:
+        y = 0.786 * x - 0.0862 * rh + 5.75
+    elif x < 260:
+        w = (x / 50.0) - (21.0 / 5.0)
+        y = (
+            ((0.69 * w) + (0.786 * (1 - w))) * x
+            - 0.0862 * rh * (1 - w)
+            + 2.966 * w
+            + 5.75 * (1 - w)
+            + 8.84e-4 * (x ** 2) * w
+        )
+    else:
+        y = 2.966 + 0.69 * x + 8.84e-4 * (x ** 2)
+
+    return round(max(0.0, y), 1)
+
+# EPA Correction for Indoor Sensors
+def epa_pm25_correction_indoor(pm25_cf1, humidity):
+
+    if pm25_cf1 is None:
+        return None
+
+    x = float(pm25_cf1)
+    rh = 0.0 if humidity is None else max(0.0, min(100.0, float(humidity)))
+
+    if x < 570:
+        y = 0.524 * x - 0.0862 * rh + 5.75
+    elif x < 611:
+        w = 0.0244 * x - 13.9
+        eq1 = 0.524 * x - 0.0862 * rh + 5.75
+        eq3 = 4.21e-4 * (x ** 2) + 0.392 * x + 3.44
+        y = w * eq3 + (1 - w) * eq1
+    else:
+        y = 4.21e-4 * (x ** 2) + 0.392 * x + 3.44
+
+    return round(max(0.0, y), 1)
+
+# Apply EPA Correction to Individual Sensors and Average
+def average_corrected(a_value, b_value, humidity, correction_fn):
+    a_corr = correction_fn(a_value, humidity)
+    b_corr = correction_fn(b_value, humidity)
+
+    if a_corr is None and b_corr is None:
+        return None
+    if a_corr is None:
+        return round(b_corr, 1)
+    if b_corr is None:
+        return round(a_corr, 1)
+
+    return round((a_corr + b_corr) / 2.0, 1)
+
+# Alternative CF-3.4 Correction for PM2.5
+def pm25_alt_from_counts(p03, p05, p10, p25):
+    """Calculate PurpleAir ALT PM2.5 (cf=3.4) from cumulative particle counts per dL."""
+    if None in (p03, p05, p10, p25):
+        return None
+
+    p03 = float(p03)
+    p05 = float(p05)
+    p10 = float(p10)
+    p25 = float(p25)
+
+    # Counts within each size band
+    n1 = p03 - p05       # 0.3–0.5 µm
+    n2 = p05 - p10       # 0.5–1.0 µm
+    n3 = p10 - p25       # 1.0–2.5 µm
+
+    pm25_alt = 3.4 * (0.00030418 * n1 + 0.0018512 * n2 +0.02069706 * n3)
+
+    return round(max(0.0, pm25_alt), 1)
+
+# Apply Alternative CF-3.4 Correction to Individual Sensors and Average
+def average_pm25_alt(a_counts, b_counts=None):
+    """Calculate PM2.5 ALT for single or dual sensors."""
+    a_alt = pm25_alt_from_counts(*a_counts) if a_counts else None
+    b_alt = pm25_alt_from_counts(*b_counts) if b_counts else None
+
+    if a_alt is None and b_alt is None:
+        return None
+    if a_alt is None:
+        return b_alt
+    if b_alt is None:
+        return a_alt
+
+    return round((a_alt + b_alt) / 2.0, 1)
 
 def calc_dewpoint(temp_f, humidity):
     """
@@ -52,13 +146,20 @@ def calc_dewpoint(temp_f, humidity):
 
 def process_heat_adjustments(json_result):
     """Since the purple air devices are affected by heat from itself, modify readings to account for difference"""
-    new_temp = json_result['current_temp_f'] + TEMP_ADJUSTMENT
-    new_humid = min(100, json_result['current_humidity'] + HUMIDITY_ADJUSTMENT)
+    raw_temp = float(json_result['current_temp_f'])
+    raw_rh = float(json_result['current_humidity'])
+
+    # Estimated corrections devloped by Lance Wallace for PurpleAir Map
+    temp_est = round((1.0227 * raw_temp) - 9.3755, 1)
+    rh_est = round((1.4498 * raw_rh) + 7.022, 1)
+    rh_est = max(0.0, min(100.0, rh_est))
 
     return {
-        'current_temp': new_temp,
-        'current_humidity': new_humid,
-        'current_dewpoint': calc_dewpoint(new_temp, new_humid)
+        'temp_operating': raw_temp,
+        'rh_operating': raw_rh,
+        'temp_estimated': temp_est,
+        'rh_estimated': rh_est,
+        'current_dewpoint': calc_dewpoint(temp_est, rh_est)
     }
 
 
@@ -84,8 +185,66 @@ def process_pm_readings(json_result, is_dual = False):
         readings[prop] = value
         readings[f'{prop}_conf'] = confidence
 
-    readings['aqi_epa'] = calc_aqi(readings['pm2_5_atm'], 'pm2_5')
-    readings['aqi_lrapa'] = calc_aqi(lrapa(readings['pm2_5_atm']), 'pm2_5')
+    humidity_raw = json_result.get('current_humidity')
+    place = str(json_result.get('place', '')).strip().lower()
+
+    # PM2.5 ALT (cf=3.4) from particle counts
+    a_counts = (
+        json_result.get('p_0_3_um'),
+        json_result.get('p_0_5_um'),
+        json_result.get('p_1_0_um'),
+        json_result.get('p_2_5_um'),
+    )
+
+    b_counts = None
+    if is_dual:
+        b_counts = (
+            json_result.get('p_0_3_um_b'),
+            json_result.get('p_0_5_um_b'),
+            json_result.get('p_1_0_um_b'),
+            json_result.get('p_2_5_um_b'),
+        )
+
+    readings['pm2_5_alt'] = average_pm25_alt(a_counts, b_counts)
+
+    # PM2.5 with EPA Adjutment for Indoor or Outdoor Sensors
+    if place == 'inside':
+        readings['pm1_0_raw'] = readings.get('pm1_0_cf_1')
+        readings['pm2_5_raw'] = readings.get('pm2_5_cf_1')
+        readings['pm10_0_raw'] = readings.get('pm10_0_cf_1')
+        readings['pm2_5_raw_conf'] = readings.get('pm2_5_cf_1_conf')
+
+        if is_dual and 'pm2_5_cf_1_b' in json_result:
+            readings['pm2_5_epa'] = average_corrected(
+                json_result.get('pm2_5_cf_1'),
+                json_result.get('pm2_5_cf_1_b'),
+                humidity_raw,
+                epa_pm25_correction_indoor
+            )
+        else:
+            readings['pm2_5_epa'] = round(epa_pm25_correction_indoor(readings.get('pm2_5_cf_1'), humidity_raw), 1)
+
+    else:
+        readings['pm1_0_raw'] = readings.get('pm1_0_atm')
+        readings['pm2_5_raw'] = readings.get('pm2_5_atm')
+        readings['pm10_0_raw'] = readings.get('pm10_0_atm')
+        readings['pm2_5_raw_conf'] = readings.get('pm2_5_atm_conf')
+
+        if is_dual and 'pm2_5_atm_b' in json_result:
+            readings['pm2_5_epa'] = average_corrected(
+                json_result.get('pm2_5_atm'),
+                json_result.get('pm2_5_atm_b'),
+                humidity_raw,
+                epa_pm25_correction_outdoor
+            )
+        else:
+            readings['pm2_5_epa'] = round(epa_pm25_correction_outdoor(readings.get('pm2_5_atm'), humidity_raw), 1)
+
+    # Calculate AQI using PM2.5 Values
+    readings['aqi_epa_raw_pm'] = calc_aqi(readings['pm2_5_raw'], 'pm2_5')
+    readings['aqi_epa_cor_pm'] = calc_aqi(readings['pm2_5_epa'], 'pm2_5')
+    readings['aqi_epa_alt_pm'] = calc_aqi(readings['pm2_5_alt'], 'pm2_5')
+
     return readings
 
 def process_dual_sensor_readings(a, b):
@@ -196,11 +355,7 @@ class PurpleAirApi:
             nodes[pa_sensor_id] = {
                 'device_location': result['place'],
                 'rssi': result['rssi'],
-                'current_temp_raw': result['current_temp_f'],
-                'current_humidity_raw': result['current_humidity'],
-                'current_dewpoint_raw': result['current_dewpoint_f'],
                 'pressure': result['pressure'],
-                'is_dual': is_dual
             }
             nodes[pa_sensor_id].update(process_pm_readings(result, is_dual))
             nodes[pa_sensor_id].update(process_heat_adjustments(result))

@@ -1,11 +1,11 @@
 {
   "domain": "purpleair",
   "name": "PurpleAir (Local)",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "homeassistant": "2025.1.0",
   "iot_class": "local_polling",
   "config_flow": true,
-  "documentation": "https://github.com/ryushi32/home-assistant-purpleair",
+  "documentation": "https://github.com/cosmic-driftr/home-assistant-purpleair",
   "requirements": [],
   "ssdp": [],
   "zeroconf": [],
@@ -14,6 +14,7 @@
   "codeowners": [
     "@gibwar",
     "@catchdave",
-    "@ryushi32"
+    "@ryushi32",
+    "@cosmic_driftr"
   ]
 }

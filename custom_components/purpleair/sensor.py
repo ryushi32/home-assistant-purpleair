@@ -4,24 +4,15 @@ import logging
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.components.sensor import SensorEntity
 
-from .const import DISPATCHER_PURPLE_AIR, DOMAIN, MANUFACTURER, SENSORS_MAP, SENSORS_DUAL_ONLY, MODEL_PA_FLEX, MODEL_PA_2
+from .const import DISPATCHER_PURPLE_AIR, DOMAIN, MANUFACTURER, SENSORS_MAP
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass, config_entry, async_schedule_add_entities):
-    _LOGGER.debug('Registering aqi sensor with data: %s', config_entry.data)
-
-    # Backwards compat for sensors added before 'is_dual' key created in config_flow
-    if 'is_dual' in config_entry.data:
-        is_dual = config_entry.data['is_dual']
-    else:
-        is_dual = config_entry.data['model'] in [MODEL_PA_FLEX, MODEL_PA_2]  # Backup to test for dual sensors
-
     entities = []
     for index, entity_desc in SENSORS_MAP.items():
-        if is_dual or entity_desc['key'] not in SENSORS_DUAL_ONLY:
-            entities.append(PurpleAirQualitySensor(hass, index, config_entry, entity_desc))
+        entities.append(PurpleAirQualitySensor(hass, index, config_entry, entity_desc))
 
     async_schedule_add_entities(entities)
 
@@ -77,9 +68,20 @@ class PurpleAirQualitySensor(SensorEntity):
     @property
     def name(self):
         nice_entity_title = self.idx.replace('_', ' ').title()
-        if 'air_quality_index' in self.idx:
-            left, last = nice_entity_title.rsplit(' ', 1)
-            nice_entity_title = f'{left} ({last.upper()})'
+        nice_entity_title = nice_entity_title.replace("Pm1 0", "PM1.0")
+        nice_entity_title = nice_entity_title.replace("Pm2 5", "PM2.5")
+        nice_entity_title = nice_entity_title.replace("Pm10 0", "PM10")
+        nice_entity_title = nice_entity_title.replace("Rh", "RH")
+        nice_entity_title = nice_entity_title.replace("Aqi", "AQI")
+        nice_entity_title = nice_entity_title.replace("Epa", "EPA")
+        nice_entity_title = nice_entity_title.replace("PM1.0 Raw", "PM1.0 (Raw)")
+        nice_entity_title = nice_entity_title.replace("PM2.5 Raw", "PM2.5 (Raw)")
+        nice_entity_title = nice_entity_title.replace("PM10 Raw", "PM10 (Raw)")
+        nice_entity_title = nice_entity_title.replace("PM2.5 EPA", "PM2.5 (EPA)")
+        nice_entity_title = nice_entity_title.replace("PM2.5 Alt", "PM2.5 (ALT CF=3.4)")
+        nice_entity_title = nice_entity_title.replace("AQI EPA Raw Pm", "US AQI (Raw PM2.5)")
+        nice_entity_title = nice_entity_title.replace("AQI EPA Cor Pm", "US AQI (EPA PM2.5)")
+        nice_entity_title = nice_entity_title.replace("AQI EPA Alt Pm", "US AQI (ALT CF=3.4)")
         return f'{self.pa_sensor_name} {nice_entity_title}'
 
     @property

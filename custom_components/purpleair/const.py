@@ -14,31 +14,31 @@ AQI_BREAKPOINTS = {
         { 'pm_low':     0, 'pm_high':  12.0, 'aqi_low':   0, 'aqi_high':  50 },
     ],
 }
-PARTICLE_PROPS = ['pm1_0_atm', 'pm2_5_atm', 'pm10_0_atm']
+PARTICLE_PROPS = ['pm1_0_atm', 'pm2_5_atm', 'pm10_0_atm', 'pm1_0_cf_1', 'pm2_5_cf_1', 'pm10_0_cf_1']
 
 # Map of sensors to create entities for
 SENSORS_MAP = {
-    'pm2_5_aqi_a_raw':         {'key': 'pm2_5_aqi_raw',    'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM25, 'icon': 'mdi:blur-linear'},
-    'pm2_5_aqi_b_raw':         {'key': 'pm2_5_aqi_b_raw',  'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM25, 'icon': 'mdi:blur-linear'},
-    'pm2_5_atm_confidence':    {'key': 'pm2_5_atm_conf',   'uom': None, 'device_class': None, 'icon': 'mdi:seal'},
-    'particulate_matter_0_1':  {'key': 'pm1_0_atm',        'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM1,  'icon': 'mdi:blur'},
-    'particulate_matter_2_5':  {'key': 'pm2_5_atm',        'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM25, 'icon': 'mdi:blur'},
-    'particulate_matter_10':   {'key': 'pm10_0_atm',       'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM10, 'icon': 'mdi:blur'},
-    'air_quality_index_epa':   {'key': 'aqi_epa',          'uom': None, 'device_class': SensorDeviceClass.AQI,  'icon': 'mdi:weather-hazy'},
-    'air_quality_index_lrapa': {'key': 'aqi_lrapa',        'uom': None, 'device_class': SensorDeviceClass.AQI,  'icon': 'mdi:weather-hazy'},
-    'humidity':                {'key': 'current_humidity', 'uom': '%', 'device_class': SensorDeviceClass.HUMIDITY, 'icon': 'mdi:water-percent'},
-    'temperature':             {'key': 'current_temp',     'uom': UnitOfTemperature.FAHRENHEIT, 'device_class': SensorDeviceClass.TEMPERATURE, 'icon': 'mdi:thermometer'},
+    'sensor_confidence':       {'key': 'pm2_5_raw_conf',   'uom': None, 'device_class': None, 'icon': 'mdi:seal'},
+    'pm1_0_raw':               {'key': 'pm1_0_raw',        'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM1,  'icon': 'mdi:blur'},
+    'pm2_5_raw':               {'key': 'pm2_5_raw',        'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM25, 'icon': 'mdi:blur'},
+    'pm2_5_epa':               {'key': 'pm2_5_epa',        'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM25, 'icon': 'mdi:blur'},
+    'pm2_5_alt':               {'key': 'pm2_5_alt',        'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM25, 'icon': 'mdi:blur'},
+    'pm10_0_raw':              {'key': 'pm10_0_raw',       'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM10, 'icon': 'mdi:blur'},
+    'aqi_epa_raw_pm':          {'key': 'aqi_epa_raw_pm',   'uom': None, 'device_class': SensorDeviceClass.AQI, 'icon': 'mdi:weather-hazy'},
+    'aqi_epa_cor_pm':          {'key': 'aqi_epa_cor_pm',   'uom': None, 'device_class': SensorDeviceClass.AQI, 'icon': 'mdi:weather-hazy'},
+    'aqi_epa_alt_pm':          {'key': 'aqi_epa_alt_pm',   'uom': None, 'device_class': SensorDeviceClass.AQI, 'icon': 'mdi:weather-hazy'},
+    'rh_operating':            {'key': 'rh_operating',     'uom': '%', 'device_class': SensorDeviceClass.HUMIDITY, 'icon': 'mdi:water-percent'},
+    'rh_estimated':            {'key': 'rh_estimated',     'uom': '%', 'device_class': SensorDeviceClass.HUMIDITY, 'icon': 'mdi:water-percent'},
+    'temp_operating':          {'key': 'temp_operating',   'uom': UnitOfTemperature.FAHRENHEIT, 'device_class': SensorDeviceClass.TEMPERATURE, 'icon': 'mdi:thermometer'},
+    'temp_estimated':          {'key': 'temp_estimated',   'uom': UnitOfTemperature.FAHRENHEIT, 'device_class': SensorDeviceClass.TEMPERATURE, 'icon': 'mdi:thermometer'},
     'dewpoint':                {'key': 'current_dewpoint', 'uom': UnitOfTemperature.FAHRENHEIT, 'device_class': SensorDeviceClass.TEMPERATURE, 'icon': 'mdi:water-outline'},
     'pressure':                {'key': 'pressure',         'uom': UnitOfPressure.HPA, 'device_class': SensorDeviceClass.PRESSURE, 'icon': 'mdi:gauge'},
     'rssi':                    {'key': 'rssi',             'uom': 'dBm', 'device_class': SensorDeviceClass.SIGNAL_STRENGTH, 'icon': 'mdi:wifi'}
 }
-SENSORS_DUAL_ONLY = ['pm2_5_aqi_b_raw']
 
 MANUFACTURER = 'Purple Air'
 DISPATCHER_PURPLE_AIR = 'dispatcher_purple_air'
 DOMAIN = "purpleair"
-TEMP_ADJUSTMENT = -8  # From PurpleAir javascript: `(parseInt(temp) + -8).toFixed(0);`
-HUMIDITY_ADJUSTMENT = +4  # From PurpleAir javascript: `(hum = parseInt(hum) + 4) > 100 && (hum = 100)`
 
 LOCAL_SCAN_INTERVAL = 30
 LOCAL_URL_FORMAT = "http://{0}/json?live=false"
