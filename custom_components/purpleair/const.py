@@ -4,16 +4,39 @@ from homeassistant.components.sensor import SensorDeviceClass
 
 AQI_BREAKPOINTS = {
     'pm2_5': [
-        { 'pm_low': 500.5, 'pm_high': 999.9, 'aqi_low': 501, 'aqi_high': 999 },
-        { 'pm_low': 350.5, 'pm_high': 500.4, 'aqi_low': 401, 'aqi_high': 500 },
-        { 'pm_low': 250.5, 'pm_high': 350.4, 'aqi_low': 301, 'aqi_high': 400 },
-        { 'pm_low': 150.5, 'pm_high': 250.4, 'aqi_low': 201, 'aqi_high': 300 },
-        { 'pm_low':  55.5, 'pm_high': 150.4, 'aqi_low': 151, 'aqi_high': 200 },
-        { 'pm_low':  35.5, 'pm_high':  55.4, 'aqi_low': 101, 'aqi_high': 150 },
-        { 'pm_low':  12.1, 'pm_high':  35.4, 'aqi_low':  51, 'aqi_high': 100 },
-        { 'pm_low':     0, 'pm_high':  12.0, 'aqi_low':   0, 'aqi_high':  50 },
+        { 'pm_low': 500.5, 'pm_high': 999.9, 'aqi_low': 501, 'aqi_high': 999, 'label': 'Hazardous' },
+        { 'pm_low': 350.5, 'pm_high': 500.4, 'aqi_low': 401, 'aqi_high': 500, 'label': 'Hazardous' },
+        { 'pm_low': 250.5, 'pm_high': 350.4, 'aqi_low': 301, 'aqi_high': 400, 'label': 'Hazardous' },
+        { 'pm_low': 150.5, 'pm_high': 250.4, 'aqi_low': 201, 'aqi_high': 300, 'label': 'Very Unhealthy' },
+        { 'pm_low':  55.5, 'pm_high': 150.4, 'aqi_low': 151, 'aqi_high': 200, 'label': 'Unhealthy' },
+        { 'pm_low':  35.5, 'pm_high':  55.4, 'aqi_low': 101, 'aqi_high': 150, 'label': 'Unhealthy for Sensitive Groups' },
+        { 'pm_low':  12.1, 'pm_high':  35.4, 'aqi_low':  51, 'aqi_high': 100, 'label': 'Moderate' },
+        { 'pm_low':     0, 'pm_high':  12.0, 'aqi_low':   0, 'aqi_high':  50, 'label': 'Good' },
     ],
 }
+
+# 2024 USEPA NAAQS - To be incorporated once PurpleAir confirms transition to these breakpoints
+#AQI_BREAKPOINTS = {
+#    'pm2_5': [
+#        {'pm_low': 325.5, 'pm_high': 99999.9, 'aqi_low': 501, 'aqi_high': 999, 'label': 'Hazardous'},
+#        {'pm_low': 225.5, 'pm_high': 325.4,   'aqi_low': 301, 'aqi_high': 500, 'label': 'Hazardous'},
+#        {'pm_low': 125.5, 'pm_high': 225.4,   'aqi_low': 201, 'aqi_high': 300, 'label': 'Very Unhealthy'},
+#        {'pm_low': 55.5,  'pm_high': 125.4,   'aqi_low': 151, 'aqi_high': 200, 'label': 'Unhealthy'},
+#        {'pm_low': 35.5,  'pm_high': 55.4,    'aqi_low': 101, 'aqi_high': 150, 'label': 'Unhealthy for Sensitive Groups'},
+#        {'pm_low': 9.1,   'pm_high': 35.4,    'aqi_low': 51,  'aqi_high': 100, 'label': 'Moderate'},
+#        {'pm_low': 0.0,   'pm_high': 9.0,     'aqi_low': 0,   'aqi_high': 50,  'label': 'Good'},
+#    ],
+#}
+
+VOC_IAQ_BREAKPOINTS = [
+    { 'low': 0,   'high': 50,  'label': 'Good' },
+    { 'low': 51,  'high': 100, 'label': 'Average' },
+    { 'low': 101, 'high': 150, 'label': 'Little Bad' },
+    { 'low': 151, 'high': 200, 'label': 'Bad' },
+    { 'low': 201, 'high': 300, 'label': 'Worse' },
+    { 'low': 301, 'high': 500, 'label': 'Very Bad' },
+]
+
 PARTICLE_PROPS = ['pm1_0_atm', 'pm2_5_atm', 'pm10_0_atm', 'pm1_0_cf_1', 'pm2_5_cf_1', 'pm10_0_cf_1']
 
 # Map of sensors to create entities for
@@ -34,6 +57,8 @@ SENSORS_MAP = {
     'dewpoint':                {'key': 'current_dewpoint', 'uom': UnitOfTemperature.FAHRENHEIT, 'device_class': SensorDeviceClass.TEMPERATURE, 'icon': 'mdi:water-outline'},
     'pressure':                {'key': 'pressure',         'uom': UnitOfPressure.HPA, 'device_class': SensorDeviceClass.PRESSURE, 'icon': 'mdi:gauge'},
     'rssi':                    {'key': 'rssi',             'uom': 'dBm', 'device_class': SensorDeviceClass.SIGNAL_STRENGTH, 'icon': 'mdi:wifi'}
+    'voc_experimental':        {'key': 'gas_680',          'uom': None, 'device_class': None, 'icon': 'mdi:flask-outline'},
+    'voc_iaq_class':           {'key': 'voc_iaq_class',    'uom': None, 'device_class': None, 'icon': 'mdi:home-air-filter'},
 }
 
 MANUFACTURER = 'Purple Air'
