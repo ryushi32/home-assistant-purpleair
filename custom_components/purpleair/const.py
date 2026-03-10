@@ -22,6 +22,7 @@ SENSORS_MAP = {
     'pm1_0_raw':               {'key': 'pm1_0_raw',        'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM1,  'icon': 'mdi:blur'},
     'pm2_5_raw':               {'key': 'pm2_5_raw',        'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM25, 'icon': 'mdi:blur'},
     'pm2_5_epa':               {'key': 'pm2_5_epa',        'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM25, 'icon': 'mdi:blur'},
+    'pm2_5_alt':               {'key': 'pm2_5_alt',        'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM25, 'icon': 'mdi:blur'},
     'pm10_0_raw':              {'key': 'pm10_0_raw',       'uom': 'µg/m³', 'device_class': SensorDeviceClass.PM10, 'icon': 'mdi:blur'},
     'aqi_epa_raw_pm':          {'key': 'aqi_epa_raw_pm',   'uom': None, 'device_class': SensorDeviceClass.AQI, 'icon': 'mdi:weather-hazy'},
     'aqi_epa_cor_pm':          {'key': 'aqi_epa_cor_pm',   'uom': None, 'device_class': SensorDeviceClass.AQI, 'icon': 'mdi:weather-hazy'},
