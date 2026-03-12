@@ -80,7 +80,7 @@ def epa_pm25_correction_outdoor(pm25_atm, humidity):
     else:
         y = 2.966 + 0.69 * x + 8.84e-4 * (x ** 2)
 
-    return round(max(0.0, y), 1)
+    return (max(0.0, y), 1)
 
 # EPA Correction for Indoor Sensors
 def epa_pm25_correction_indoor(pm25_cf1, humidity):
@@ -101,7 +101,7 @@ def epa_pm25_correction_indoor(pm25_cf1, humidity):
     else:
         y = 4.21e-4 * (x ** 2) + 0.392 * x + 3.44
 
-    return round(max(0.0, y), 1)
+    return (max(0.0, y), 1)
 
 # Apply EPA Correction to Individual Sensors and Average
 def average_corrected(a_value, b_value, humidity, correction_fn):
@@ -168,14 +168,45 @@ def calc_dewpoint(temp_f, humidity):
     return dew_point_f
 
 
+def calc_heat_index(temp_f, humidity):
+    """Calculate U.S. Heat Index (°F)."""
+
+    t = float(temp_f)
+    rh = max(0.0, min(100.0, float(humidity)))
+
+    c1 = -42.379
+    c2 = 2.04901523
+    c3 = 10.14333127
+    c4 = -0.22475541
+    c5 = -6.83783e-3
+    c6 = -5.481717e-2
+    c7 = 1.22874e-3
+    c8 = 8.5282e-4
+    c9 = -1.99e-6
+
+    return round(
+        c1 + c2*t + c3*rh + c4*t*rh + c5*t*t + c6*rh*rh +
+        c7*t*t*rh + c8*t*rh*rh + c9*t*t*rh*rh,
+        1
+    )
+
+
 def process_heat_adjustments(json_result):
     """Since the purple air devices are affected by heat from itself, modify readings to account for difference"""
     raw_temp = float(json_result['current_temp_f'])
     raw_rh = float(json_result['current_humidity'])
+    place = str(json_result.get('place', '')).strip().lower()
 
-    # Estimated corrections devloped by Lance Wallace for PurpleAir Map
-    temp_est = round((1.0227 * raw_temp) - 9.3755, 1)
-    rh_est = round((1.4498 * raw_rh) + 7.022, 1)
+    # Estimated corrections developed by Lance Wallace
+    if place == 'inside':
+        # Indoor correction equations
+        temp_est = (0.9733 * raw_temp) - 6.4149
+        rh_est = (1.3611 * raw_rh) + 5.1555
+    else:
+        # Outdoor correction equations
+        temp_est = (1.0227 * raw_temp) - 9.3755
+        rh_est = (1.4498 * raw_rh) + 7.022
+        
     rh_est = max(0.0, min(100.0, rh_est))
 
     return {
@@ -184,6 +215,7 @@ def process_heat_adjustments(json_result):
         'temp_estimated': temp_est,
         'rh_estimated': rh_est,
         'current_dewpoint': calc_dewpoint(temp_est, rh_est)
+        'heat_index': calc_heat_index(temp_est, rh_est),
     }
 
 
