@@ -19,7 +19,7 @@ To register a new purple air device:
 3. Give it a name.
 
 #### Current Sensors
-This will create 18 entities per device:
+This will create 19 entities per device:
 * Particulate Matter 1.0 (Raw)
 * Particulate Matter 2.5 (Raw)
 * Particulate Matter 2.5 (EPA)
@@ -33,6 +33,7 @@ This will create 18 entities per device:
 * Temperature (Operating)
 * Temperature (Estimated)
 * Dewpoint (Adjusted sensor: re-calculated to take temp & humidity adjustments)
+* US Heat Index (Calculated from Estimated RH and Temp)
 * Pressure
 * WiFi Signal Strength (RSSI)
 * PM 2.5 Confidence Level (Good, Questionable or Severe)
